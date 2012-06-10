@@ -1019,7 +1019,6 @@ public class SkyBlockCommand implements CommandExecutor {
 			return true;
 		}
 
-	
 		PlayerData pdata = SQLInstructions.loadOrCreatePlayer(player.getName());
 	
 		if (!Settings.allowContent) {

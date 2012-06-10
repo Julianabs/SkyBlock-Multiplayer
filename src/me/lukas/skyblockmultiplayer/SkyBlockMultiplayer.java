@@ -69,6 +69,11 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
+		try {
+			SQLInstructions.closeConnections();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		this.log.info("v" + pluginFile.getVersion() + " disabled.");
 	}
 
@@ -281,7 +286,6 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			SQLInstructions.loadOldWorldData(pdata);
 			SQLInstructions.loadIslandData(pdata);
 			SQLInstructions.loadFriendList(pdata);
-
 		}
 	}
 
@@ -1121,6 +1125,36 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	public static String getOwner(Location l) {
-		return SQLInstructions.getOwner(l, Settings.distanceIslands);
+		// return SQLInstructions.getOwner(l, Settings.distanceIslands);
+
+		if (l == null) {
+			return null;
+		}
+
+		for (PlayerData pdata : Settings.players.values()) {
+			if (pdata.getIslandLocation() == null) {
+				continue;
+			}
+			
+			int islandX = pdata.getIslandLocation().getBlockX();
+			int islandZ = pdata.getIslandLocation().getBlockZ();
+
+			int blockX = l.getBlockX();
+			int blockZ = l.getBlockZ();
+
+			int dist = 0;
+			if (Settings.build_withProtectedBorder) {
+				dist = (Settings.distanceIslands / 2) - 3;
+			} else {
+				dist = Settings.distanceIslands / 2;
+			}
+
+			if (islandX + dist >= blockX && islandX - dist <= blockX) {
+				if (islandZ + dist >= blockZ && islandZ - dist <= blockZ) {
+					return pdata.getPlayerName();
+				}
+			}
+		}
+		return null;
 	}
 }

@@ -11,18 +11,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-
-
 public class SQLInstructions {
 	private static Connection conn;
 	private static Statement stat;
 
-	public static int bool2int(boolean b){
+	public static int bool2int(boolean b) {
 		if (b)
 			return 1;
 		return 0;
 	}
-	
+
 	public static void initializeConnections() throws ClassNotFoundException {
 		try {
 			Class.forName("org.sqlite.JDBC");
@@ -31,7 +29,7 @@ public class SQLInstructions {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
 
 	public static void closeConnections() throws SQLException {
 		SQLInstructions.stat.close();
@@ -71,7 +69,7 @@ public class SQLInstructions {
 						"level integer);");
 		
 		stat.execute("CREATE TABLE IF NOT EXISTS skyblockWorld (" +
-						"playerName varchar REFERENCES player(playerName),"+
+						"playerName varchar primary key REFERENCES player(playerName),"+
 						"location varchar,"+
 						"inventory varchar,"+
 						"armor varchar,"+
@@ -90,6 +88,8 @@ public class SQLInstructions {
 	
 	public static boolean writePartialPlayerData(PlayerData pdata){
 		try {
+			// stat.execute("BEGIN");
+			
 			stat.execute("INSERT OR REPLACE INTO players (" +
 					"playerName," +
 					"isOnIsland," +
@@ -109,6 +109,7 @@ public class SQLInstructions {
 						"'"+friend.getPlayerName()+"');");
 			}
 			
+			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -118,6 +119,8 @@ public class SQLInstructions {
 	
 	public static boolean writeIslandData(PlayerData pdata){
 		try {
+			// stat.execute("BEGIN");
+			
 			stat.execute("INSERT OR REPLACE INTO skyblockWorld (" +
 					"playerName,"+
 					"location,"+
@@ -135,6 +138,8 @@ public class SQLInstructions {
 					pdata.getIslandFood()+","+
 					pdata.getIslandExp()+","+
 					pdata.getIslandLevel()+");");
+			
+			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -144,6 +149,8 @@ public class SQLInstructions {
 	
 	public static boolean writeOldWorldData(PlayerData pdata){
 		try {
+			// stat.execute("BEGIN");
+			
 			stat.execute("INSERT OR REPLACE INTO oldWorld (" +
 					"playerName,"+
 					"location,"+
@@ -161,6 +168,7 @@ public class SQLInstructions {
 					pdata.getOldFood()+","+
 					pdata.getOldExp()+","+
 					pdata.getOldLevel()+");");
+			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -169,12 +177,15 @@ public class SQLInstructions {
 	}
 	
 	public static boolean existsPlayer(String playerName){
-		ResultSet rs;
+		ResultSet rs = null;
 		try {
 			rs = stat.executeQuery("SELECT COUNT(*) FROM players WHERE playerName = '"+playerName+"';");
 		rs.next();
-		if (rs.getInt(1) == 0)
+		if (rs.getInt(1) == 0) {
+			rs.close();
 			return false;
+		}
+		rs.close();
 		return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -199,6 +210,7 @@ public class SQLInstructions {
 				pdata.setIslandLocation(SkyBlockMultiplayer.getInstance().StringToLocation(rs.getString("islandLocation")));
 				Settings.players.put(pdata.getPlayerName(), pdata);
 			}
+			rs.close();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -212,8 +224,10 @@ public class SQLInstructions {
 			rs = stat.executeQuery("SELECT * FROM players" +
 									" JOIN islands ON islands.playerName = players.playerName" +
 									" WHERE players.playerName = '"+pdata.getPlayerName()+"';");
-		if (rs.next() == false)
+		if (rs.next() == false) {
+			rs.close();
 			return true;
+		}
 
 		pdata.setHasIsland(rs.getBoolean("islandNumber"));
 		pdata.setDeathStatus(rs.getBoolean("isDead"));
@@ -232,8 +246,10 @@ public class SQLInstructions {
 		try {
 			rs = stat.executeQuery("SELECT * FROM oldWorld " +
 					"WHERE playerName = '"+pdata.getPlayerName()+"';");
-		if (rs.next() == false)
+		if (rs.next() == false) {
+			rs.close();
 			return true;
+		}
 
 		pdata.setOldLocation(SkyBlockMultiplayer.getInstance().StringToLocation(rs.getString("location")));
 		pdata.setOldInventory(ItemParser.StringToInventory(rs.getString("inventory"), 36));
@@ -243,6 +259,7 @@ public class SQLInstructions {
 		pdata.setOldExp(rs.getFloat("exp"));
 		pdata.setOldLevel(rs.getInt("level"));
 		
+		rs.close();		
 		return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -266,6 +283,7 @@ public class SQLInstructions {
 		pdata.setIslandExp(rs.getFloat("exp"));
 		pdata.setIslandLevel(rs.getInt("level"));
 		
+		rs.close();
 		return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -274,8 +292,9 @@ public class SQLInstructions {
 	}
 
 	public static boolean writeNewIsland(PlayerData pdata, CreateNewIsland island){
-		
 		try {
+			// stat.execute("BEGIN");
+			
 			stat.execute("INSERT OR REPLACE INTO islands (" +
 					"islandLocation," +
 					"x," +
@@ -285,6 +304,8 @@ public class SQLInstructions {
 					island.Islandlocation.getBlockX()+","+
 					island.Islandlocation.getBlockZ()+","+
 					"'"+pdata.getPlayerName()+"');");
+			
+
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -304,25 +325,25 @@ public class SQLInstructions {
 												" AND x <= "+xmax+
 												" AND z >= "+zmin+
 												" AND z <= "+zmax+";");
-			if (!rs.next())
+			if (!rs.next()) {
+				rs.close();
 				return null;
-			return rs.getString("playerName");
+			}
+			String res = rs.getString("playerName");
+			rs.close();
+			return res;
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
 		}
-	
 	}
-	
-
 	
 	public static boolean loadFriendList(PlayerData pdata){
 		try {
 		ResultSet rs;	
 			rs = stat.executeQuery("SELECT friendname FROM friends " +
 						"WHERE playerName = '"+pdata.getPlayerName()+"';");
-		
 		
 			while(rs.next()){
 				if (!Settings.players.containsKey(rs.getString("friendName")))
@@ -331,6 +352,7 @@ public class SQLInstructions {
 				pdata.addFriendsToOwnIsland(friend);
 				friend.addOwnBuildPermission(pdata);
 			}
+			rs.close();
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -339,7 +361,7 @@ public class SQLInstructions {
 	}
 	
 	// @formatter:on
-	
+
 	public static PlayerData loadOrCreatePlayer(String playername) {
 		boolean inList = Settings.players.containsKey(playername);
 		boolean inDB = SQLInstructions.existsPlayer(playername);
@@ -352,20 +374,20 @@ public class SQLInstructions {
 			// check if a playerfile exists
 			PlayerInfo pi = SkyBlockMultiplayer.getInstance().readPlayerFile(playername);
 			Player player = Bukkit.getPlayer(playername);
-			if (pi != null && player != null ){ // load existing playerinfo only if player is online
+			if (pi != null && player != null) { // load existing playerinfo only if player is online
 				pdata.setDeathStatus(pi.isDead());
 				pdata.setHasIsland(pi.getHasIsland());
 				pdata.setHomeLocation(pi.getHomeLocation());
 				pdata.setIslandsLeft(pi.getIslandsLeft());
 				pdata.setLivesLeft(pi.getLivesLeft());
-				
+
 				// check isOnIslandVariable
-				if (player.getWorld().getName().equals(SkyBlockMultiplayer.getSkyBlockWorld().getName()) &&  !SkyBlockMultiplayer.getInstance().playerIsOnTower(player)){
+				if (player.getWorld().getName().equals(SkyBlockMultiplayer.getSkyBlockWorld().getName()) && !SkyBlockMultiplayer.getInstance().playerIsOnTower(player)) {
 					pdata.setIsOnIslandStatus(true);
 				} else {
 					pdata.setIsOnIslandStatus(false);
 				}
-				
+
 				pdata.setIslandArmor(pi.getIslandArmor());
 				pdata.setIslandExp(pi.getIslandExp());
 				pdata.setIslandFood(pi.getIslandFood());
@@ -373,7 +395,7 @@ public class SQLInstructions {
 				pdata.setIslandInventory(pi.getIslandInventory());
 				pdata.setIslandLevel(pi.getIslandLevel());
 				pdata.setIslandLocation(pi.getIslandLocation());
-								
+
 				pdata.setOldArmor(pi.getOldArmor());
 				pdata.setOldExp(pi.getOldExp());
 				pdata.setOldFood(pi.getOldFood());
@@ -383,11 +405,11 @@ public class SQLInstructions {
 				pdata.setOldLocation(pi.getOldLocation());
 
 			}
-			if (player != null){
+			if (player != null) {
 				SQLInstructions.writePartialPlayerData(pdata);
 				Settings.players.put(playername, pdata);
 			}
-			
+
 			return pdata;
 		}
 		if (!inList) { // player is missing in list but exists in DB
