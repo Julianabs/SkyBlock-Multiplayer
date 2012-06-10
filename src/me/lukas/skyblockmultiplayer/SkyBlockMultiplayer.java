@@ -106,6 +106,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		try {
 			SQLInstructions.initializeConnections();
 			SQLInstructions.createTables();
+			this.loadOnlinePlayersFromDB();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -268,12 +269,11 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 	}
 
+	public void loadOnlinePlayersFromDB() {
 
-	public void loadOnlinePlayersFromDB(){
-		
 		// load all players parially
 		SQLInstructions.loadAllPlayersPartial();
-		for (Player player : this.getServer().getOnlinePlayers()){
+		for (Player player : this.getServer().getOnlinePlayers()) {
 			if (!Settings.players.containsKey(player.getName()))
 				continue;
 			// load world informations for online players
@@ -445,7 +445,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		if (page <= 0) {
 			String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + 1 + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----\n" + ChatColor.WHITE;
 			sender.sendMessage(top);
-			
+
 			for (String cmd : this.helpMap[0].split("\n")) {
 				if (!cmd.equalsIgnoreCase("")) {
 					sender.sendMessage(cmd);
@@ -456,7 +456,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		if (page > this.helpMap.length) {
 			String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + this.helpMap.length + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----\n" + ChatColor.WHITE;
 			sender.sendMessage(top);
-			
+
 			for (String cmd : this.helpMap[this.helpMap.length - 1].split("\n")) {
 				if (!cmd.equalsIgnoreCase("")) {
 					sender.sendMessage(cmd);
@@ -466,7 +466,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + page + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----\n" + ChatColor.WHITE;
 		sender.sendMessage(top);
-		
+
 		for (String cmd : this.helpMap[page - 1].split("\n")) {
 			if (!cmd.equalsIgnoreCase("")) {
 				sender.sendMessage(cmd);
@@ -844,8 +844,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		return null;
 	}
-	
-	
+
 	public Location getSafeHomeLocation(PlayerData p) {
 		// a) check original location
 		Location home = null;

@@ -978,8 +978,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			return true;
 		}
 
-		PlayerData pi = new PlayerData();
-		pi.setPlayerName(res);
+		PlayerData pi = new PlayerData(res);
 		if (Settings.players.containsKey(res)) {
 			PlayerData oldPi = Settings.players.get(res);
 			pi.setOldLocation(oldPi.getOldLocation());

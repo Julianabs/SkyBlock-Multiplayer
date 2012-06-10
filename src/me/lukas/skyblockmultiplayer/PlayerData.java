@@ -57,9 +57,6 @@ public class PlayerData {
 		this.oldArmor = new ItemStack[4];
 	}
 
-	public PlayerData() {
-	};
-
 	public void updateSQLPartialData() {
 		SQLInstructions.writePartialPlayerData(this);
 	}

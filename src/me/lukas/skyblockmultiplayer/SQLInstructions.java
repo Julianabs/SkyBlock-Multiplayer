@@ -81,8 +81,8 @@ public class SQLInstructions {
 						"level integer);");
 		
 		stat.execute("CREATE TABLE IF NOT EXISTS friends (" +
-						"playername varchar REFERENCES player(playername),"+
-						"friendname varchar REFERENCES player(playername))");
+						"playerName varchar REFERENCES player(playerName),"+
+						"friendName varchar REFERENCES player(playerName))");
 		
 		
 		
@@ -101,10 +101,10 @@ public class SQLInstructions {
 					SQLInstructions.bool2int(pdata.isDead())+","+
 					pdata.getLivesLeft()+","+
 					pdata.getIslandsLeft() + ");");
-			stat.execute("DELETE from friends WHERE playername='"+pdata.getPlayerName()+"';");
+			stat.execute("DELETE from friends WHERE playerName='"+pdata.getPlayerName()+"';");
 			for (PlayerData friend : pdata.getFriends().values()){
 				stat.execute("INSERT INTO friends (" +
-						"playerName,friendname VALUES (" +
+						"playerName,friendName) VALUES (" +
 						"'"+pdata.getPlayerName()+"',"+
 						"'"+friend.getPlayerName()+"');");
 			}
@@ -183,22 +183,20 @@ public class SQLInstructions {
 	}
 	
 	public static boolean loadAllPlayersPartial(){
-		
 		Settings.players = new HashMap<String,PlayerData>();
 
 		try {
 			ResultSet rs;
-			rs = stat.executeQuery("SELECT * FROM players" +
+			rs = stat.executeQuery("SELECT players.*,islands.islandNumber,islands.islandLocation FROM players" +
 									" JOIN islands ON islands.playerName = players.playerName;");
 			while (rs.next()){
-				PlayerData pdata = new PlayerData();
-				pdata.setPlayerName(rs.getString("players.playerName"));
-				pdata.setHasIsland(rs.getBoolean("islands.islandNumber"));
-				pdata.setDeathStatus(rs.getBoolean("players.isDead"));
-				pdata.setIslandsLeft(rs.getInt("players.islandsLeft"));
-				pdata.setLivesLeft(rs.getInt("players.livesLeft"));
-				pdata.setHomeLocation(SkyBlockMultiplayer.getInstance().StringToLocation(rs.getString("players.homeLocation")));
-				pdata.setIslandLocation(SkyBlockMultiplayer.getInstance().StringToLocation(rs.getString("islands.islandLocation")));
+				PlayerData pdata = new PlayerData(rs.getString("playerName"));
+				pdata.setHasIsland(rs.getBoolean("islandNumber"));
+				pdata.setDeathStatus(rs.getBoolean("isDead"));
+				pdata.setIslandsLeft(rs.getInt("islandsLeft"));
+				pdata.setLivesLeft(rs.getInt("livesLeft"));
+				pdata.setHomeLocation(SkyBlockMultiplayer.getInstance().StringToLocation(rs.getString("homeLocation")));
+				pdata.setIslandLocation(SkyBlockMultiplayer.getInstance().StringToLocation(rs.getString("islandLocation")));
 				Settings.players.put(pdata.getPlayerName(), pdata);
 			}
 			return true;
@@ -301,11 +299,11 @@ public class SQLInstructions {
 		int zmax = click.getBlockZ()+distance;
 		
 		try {
-			ResultSet rs = stat.executeQuery("SELECT playerName from islands " +
-												"WHERE x >= "+xmin+
-												"AND x <= "+xmax+
-												"AND z >= "+zmin+
-												"AND z <= "+zmax+";");
+			ResultSet rs = stat.executeQuery("SELECT playerName from islands" +
+												" WHERE x >= "+xmin+
+												" AND x <= "+xmax+
+												" AND z >= "+zmin+
+												" AND z <= "+zmax+";");
 			if (!rs.next())
 				return null;
 			return rs.getString("playerName");
@@ -327,9 +325,9 @@ public class SQLInstructions {
 		
 		
 			while(rs.next()){
-				if (!Settings.players.containsKey(rs.getString("friendname")))
+				if (!Settings.players.containsKey(rs.getString("friendName")))
 					continue;
-				PlayerData friend = Settings.players.get(rs.getString("friendname"));
+				PlayerData friend = Settings.players.get(rs.getString("friendName"));
 				pdata.addFriendsToOwnIsland(friend);
 				friend.addOwnBuildPermission(pdata);
 			}
