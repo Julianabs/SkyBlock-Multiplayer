@@ -457,7 +457,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			pdata.setIslandFood(20);
 			pdata.setIslandExp(0);
 			pdata.setIslandLevel(0);
-			
+
 			SQLInstructions.writeIslandData(pdata);
 			SQLInstructions.writePartialPlayerData(pdata);
 
@@ -574,8 +574,6 @@ public class SkyBlockCommand implements CommandExecutor {
 		return true;
 	}
 
-	
-
 	/**
 	 * Get an island in the world SkyBlock.
 	 * 
@@ -601,7 +599,6 @@ public class SkyBlockCommand implements CommandExecutor {
 		// Write into SQL:
 		PlayerData pdata = SQLInstructions.loadOrCreatePlayer(player.getName());
 
-
 		if (Settings.gameModeSelected == Settings.GameMode.BUILD) {
 			if (!pdata.getHasIsland() || pdata.getIslandLocation() == null) {
 				// new player
@@ -614,10 +611,10 @@ public class SkyBlockCommand implements CommandExecutor {
 				pdata.setHasIsland(true);
 				pdata.setDeathStatus(false);
 				pdata.updateSQLPartialData();
-				
+
 				// put island into SQL
 				SQLInstructions.writeNewIsland(pdata, isl);
-				
+
 				if (!Settings.allowContent) {
 					// clear inventory
 					player.getInventory().clear();
@@ -631,7 +628,7 @@ public class SkyBlockCommand implements CommandExecutor {
 				// teleport player
 				SkyBlockMultiplayer.getInstance().removeCreatures(pdata.getIslandLocation());
 				player.teleport(SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pdata));
-				
+
 				Settings.numbersPlayers++;
 
 				// send message to all
@@ -652,7 +649,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			// player has a island
 			if (!Settings.allowContent) {
 				// load from island inventory, exp, level, food and health
-				
+
 				player.getInventory().setContents(pdata.getIslandInventory());
 				player.getInventory().setArmorContents(pdata.getIslandArmor());
 				player.setExp(pdata.getIslandExp());
@@ -798,7 +795,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			player.setHealth(player.getMaxHealth());
 		}
 
-		pdata.setIslandsLeft(Settings.pvp_islandsPerPlayer-1);
+		pdata.setIslandsLeft(Settings.pvp_islandsPerPlayer - 1);
 		pdata.setLivesLeft(Settings.pvp_livesPerIsland);
 		pdata.setHasIsland(true);
 		pdata.setDeathStatus(false);
@@ -843,7 +840,6 @@ public class SkyBlockCommand implements CommandExecutor {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_LEFT_SKYBLOCK.sentence);
 			return true;
 		}
-		
 
 		if (!SkyBlockMultiplayer.getInstance().playerIsOnTower(player)) {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_ONLY_ON_TOWER.sentence);
@@ -856,7 +852,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		} else {
 			player.teleport(l);
 		}
-				
+
 		if (pdata.getIslandLocation() == null) {
 			Settings.players.remove(player.getName());
 		}
@@ -884,7 +880,7 @@ public class SkyBlockCommand implements CommandExecutor {
 
 		if (Settings.gameModeSelected == Settings.GameMode.BUILD) {
 			PlayerData pdata = SQLInstructions.loadOrCreatePlayer(player.getName());
-			
+
 			pdata.setHasIsland(false);
 
 			Location l = pdata.getIslandLocation();
@@ -931,12 +927,8 @@ public class SkyBlockCommand implements CommandExecutor {
 			Settings.numbersPlayers--;
 		}
 
-
 		pdata.updateSQLPartialData();
 		SQLInstructions.writeIslandData(pdata);
-
-
-
 
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_NEW_ISLAND_PLAYER1.sentence + pdata.getPlayer().getName() + Language.MSGS_NEW_ISLAND_PLAYER2.sentence);
 		pdata.getPlayer().sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_GOT_NEW_ISLAND1.sentence + player.getName() + Language.MSGS_GOT_NEW_ISLAND2.sentence);
@@ -1020,10 +1012,10 @@ public class SkyBlockCommand implements CommandExecutor {
 		}
 
 		PlayerData pdata = SQLInstructions.loadOrCreatePlayer(player.getName());
-	
+
 		if (!Settings.allowContent) {
 			pdata.setIslandValues(player);
-			
+
 			player.getInventory().setContents(pdata.getOldInventory());
 			player.getInventory().setArmorContents(pdata.getOldArmor());
 			player.setExp(pdata.getOldExp());
@@ -1068,7 +1060,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		}
 
 		PlayerData pdata = SQLInstructions.loadOrCreatePlayer(SkyBlockMultiplayer.getOwner(CreateNewIsland.getIslandPosition(islandNumber)));
-		
+
 		pdata.setDeathStatus(false);
 		pdata.setHasIsland(false);
 		pdata.setIslandArmor(null);
@@ -1080,7 +1072,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		pdata.setIslandLocation(null);
 		pdata.setHomeLocation(null);
 		SQLInstructions.writePartialPlayerData(pdata);
-		SQLInstructions.writeIslandData(pdata);		
+		SQLInstructions.writeIslandData(pdata);
 
 		SkyBlockMultiplayer.getInstance().removeIsland(CreateNewIsland.getIslandPosition(islandNumber));
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + "Island removed!");
@@ -1100,14 +1092,13 @@ public class SkyBlockCommand implements CommandExecutor {
 		}
 
 		PlayerData pdata = SQLInstructions.loadOrCreatePlayer(player.getName());
-	
+
 		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player)) {
 			// player has a island
 			if (!Settings.allowContent) {
 				// save before joining inventory, exp, level, food and health
 				//pdata.setOldWorldValues(player);
-				
-				
+
 				// load from island inventory, exp, level, food and health
 				player.getInventory().setContents(pdata.getIslandInventory());
 				player.getInventory().setArmorContents(pdata.getIslandArmor());
@@ -1149,7 +1140,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		}
 
 		PlayerData pdata = SQLInstructions.loadOrCreatePlayer(player.getName());
-		if (pdata.checkBuildPermission(player.getLocation())){
+		if (pdata.checkBuildPermission(player.getLocation())) {
 			pdata.setHomeLocation(player.getLocation());
 			pdata.updateSQLPartialData();
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_SPAWN_LOCATION_CHANGED.sentence);
@@ -1167,7 +1158,7 @@ public class SkyBlockCommand implements CommandExecutor {
 	 * @return
 	 */
 	private boolean homeList(Player player) {
-		
+
 		PlayerData pdata = SQLInstructions.loadOrCreatePlayer(player.getName());
 
 		String list = "";
@@ -1192,8 +1183,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_NO_ISLAND_TELEPORT_IMPOSSIBLE.sentence);
 			return true;
 		}
-		
-	
+
 		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(toPlayer);
 		if (res.equalsIgnoreCase("-1")) {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_PLAYER_NAME.sentence);
@@ -1283,9 +1273,9 @@ public class SkyBlockCommand implements CommandExecutor {
 
 		pdata.addFriendsToOwnIsland(friend);
 		friend.addOwnBuildPermission(pdata);
-		
+
 		SQLInstructions.writePartialPlayerData(pdata);
-		
+
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_FRIEND_ADDED.sentence);
 		return true;
 	}
@@ -1317,7 +1307,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		friend.removeBuildPermissionByFriends(pdata);
 
 		SQLInstructions.writePartialPlayerData(pdata);
-		
+
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_FRIEND_REMOVED.sentence);
 		return true;
 	}

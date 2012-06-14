@@ -447,35 +447,20 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 	public boolean sendHelpPage(CommandSender sender, int page) {
 		if (page <= 0) {
-			String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + 1 + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----\n" + ChatColor.WHITE;
+			String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + 1 + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----" + ChatColor.WHITE;
 			sender.sendMessage(top);
-
-			for (String cmd : this.helpMap[0].split("\n")) {
-				if (!cmd.equalsIgnoreCase("")) {
-					sender.sendMessage(cmd);
-				}
-			}
+			sender.sendMessage(this.helpMap[0]);
 			return true;
 		}
 		if (page > this.helpMap.length) {
-			String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + this.helpMap.length + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----\n" + ChatColor.WHITE;
+			String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + this.helpMap.length + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----" + ChatColor.WHITE;
 			sender.sendMessage(top);
-
-			for (String cmd : this.helpMap[this.helpMap.length - 1].split("\n")) {
-				if (!cmd.equalsIgnoreCase("")) {
-					sender.sendMessage(cmd);
-				}
-			}
+			sender.sendMessage(this.helpMap[this.helpMap.length - 1]);
 			return true;
 		}
-		String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + page + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----\n" + ChatColor.WHITE;
+		String top = ChatColor.GOLD + "----- " + this.pName + " help index (" + page + "/" + this.helpMap.length + ") " + ChatColor.GOLD + " -----" + ChatColor.WHITE;
 		sender.sendMessage(top);
-
-		for (String cmd : this.helpMap[page - 1].split("\n")) {
-			if (!cmd.equalsIgnoreCase("")) {
-				sender.sendMessage(cmd);
-			}
-		}
+		sender.sendMessage(this.helpMap[page - 1]);
 		return true;
 	}
 
@@ -896,6 +881,42 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		return null;
 	}
 
+	public void changeToIslandInventory(Player player) {
+		PlayerData pData = Settings.players.get(player.getName());
+		if (pData == null || Settings.allowContent) {
+			return;
+		}
+
+		pData.setOldExp(player.getExp());
+		pData.setOldLevel(player.getLevel());
+		pData.setOldFood(player.getFoodLevel());
+		pData.setOldHealth(player.getHealth());
+		pData.setOldArmor(player.getInventory().getArmorContents());
+		pData.setOldInventory(player.getInventory().getContents());
+
+		pData.setIsOnIslandStatus(true);
+
+		SQLInstructions.writeOldWorldData(pData);
+	}
+
+	public void changeToOldInventory(Player player) {
+		PlayerData pData = Settings.players.get(player.getName());
+		if (pData == null || Settings.allowContent) {
+			return;
+		}
+
+		pData.setIslandExp(player.getExp());
+		pData.setIslandLevel(player.getLevel());
+		pData.setIslandFood(player.getFoodLevel());
+		pData.setIslandHealth(player.getHealth());
+		pData.setIslandArmor(player.getInventory().getArmorContents());
+		pData.setIslandInventory(player.getInventory().getContents());
+
+		pData.setIsOnIslandStatus(false);
+
+		SQLInstructions.writeIslandData(pData);
+	}
+
 	public boolean isSafeLocation(Location l) {
 		if (l == null) {
 			return false;
@@ -1135,7 +1156,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			if (pdata.getIslandLocation() == null) {
 				continue;
 			}
-			
+
 			int islandX = pdata.getIslandLocation().getBlockX();
 			int islandZ = pdata.getIslandLocation().getBlockZ();
 

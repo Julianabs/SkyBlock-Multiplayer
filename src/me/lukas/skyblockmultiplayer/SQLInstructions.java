@@ -88,8 +88,6 @@ public class SQLInstructions {
 	
 	public static boolean writePartialPlayerData(PlayerData pdata){
 		try {
-			// stat.execute("BEGIN");
-			
 			stat.execute("INSERT OR REPLACE INTO players (" +
 					"playerName," +
 					"isOnIsland," +
@@ -119,8 +117,6 @@ public class SQLInstructions {
 	
 	public static boolean writeIslandData(PlayerData pdata){
 		try {
-			// stat.execute("BEGIN");
-			
 			stat.execute("INSERT OR REPLACE INTO skyblockWorld (" +
 					"playerName,"+
 					"location,"+
@@ -149,8 +145,6 @@ public class SQLInstructions {
 	
 	public static boolean writeOldWorldData(PlayerData pdata){
 		try {
-			// stat.execute("BEGIN");
-			
 			stat.execute("INSERT OR REPLACE INTO oldWorld (" +
 					"playerName,"+
 					"location,"+
@@ -234,6 +228,8 @@ public class SQLInstructions {
 		pdata.setIslandsLeft(rs.getInt("islandsLeft"));
 		pdata.setLivesLeft(rs.getInt("livesLeft"));
 		pdata.setHomeLocation(SkyBlockMultiplayer.getInstance().StringToLocation(rs.getString("homeLocation")));
+		
+		rs.close();
 		return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -292,9 +288,7 @@ public class SQLInstructions {
 	}
 
 	public static boolean writeNewIsland(PlayerData pdata, CreateNewIsland island){
-		try {
-			// stat.execute("BEGIN");
-			
+		try {			
 			stat.execute("INSERT OR REPLACE INTO islands (" +
 					"islandLocation," +
 					"x," +
