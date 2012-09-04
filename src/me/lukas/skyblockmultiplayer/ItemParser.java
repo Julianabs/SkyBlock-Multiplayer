@@ -1,5 +1,7 @@
 package me.lukas.skyblockmultiplayer;
 
+import java.util.ArrayList;
+
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,6 +27,36 @@ public class ItemParser {
 			}
 		}
 		return s.trim();
+	}
+
+	public static ItemStack[] getItemStackArrayFromList(ArrayList<String> list, int size) {
+		ItemStack[] items = new ItemStack[size];
+
+		for (String s : list) {
+			String[] parts = s.split("-");
+			int slot = Integer.parseInt(parts[0]);
+			ItemStack item = ItemParser.getItemStackfromString(parts[1]);
+			items[slot] = item;
+		}
+		return items;
+	}
+
+	public static ArrayList<String> getListFromItemStackArray(ItemStack[] items) {
+		ArrayList<String> list = new ArrayList<String>();
+
+		int counter = 0;
+		for (ItemStack item : items) {
+			if (item == null) {
+				counter++;
+				continue;
+			}
+			
+			String itemString = counter + "-" + ItemParser.parseItemStackToString(item);
+			list.add(itemString);
+			counter++;
+		}
+		
+		return list;
 	}
 
 	public static ItemStack getItemStackfromString(String s) {

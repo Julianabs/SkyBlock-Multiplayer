@@ -41,7 +41,7 @@ public class CreateNewIsland {
 			l = getIslandPosition(numberIslands);
 		}
 
-		player.sendMessage(Language.MSGS_SHOW_ISLAND_NUMBER.sentence + numberIslands);
+		player.sendMessage(Language.MSGS_SHOW_ISLAND_NUMBER.getSentence() + numberIslands);
 		this.createIsland(l);
 		this.Islandlocation = new Location(SkyBlockMultiplayer.getSkyBlockWorld(), l.getBlockX(), SkyBlockMultiplayer.getSkyBlockWorld().getHighestBlockAt(l.getBlockX(), l.getBlockZ()).getLocation().getBlockY(), l.getBlockZ());
 	}

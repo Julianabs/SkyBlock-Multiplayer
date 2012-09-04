@@ -100,12 +100,25 @@ public enum Language {
 	MSGS_ONLY_OUTSIDE_OF_SB("msgs.onlyOutsideOfSb", "This command works only outside of SkyBlock."),
 	MSGS_ONLY_INSIDE_OF_SB("msgs.onlyInsideOfSb", "This command works only inside of SkyBlock.");
 
-	public String path;
-	public String sentence;
+	private StringBuilder path;
+	private StringBuilder sentence;
+
+	public String getPath() {
+		return this.path.toString();
+	}
+
+	public String getSentence() {
+		
+		return this.sentence.toString();
+	}
+	
+	public void setSentence(String newSentence) {
+		this.sentence = new StringBuilder(newSentence);
+	}
 
 	private Language(String path, String sentence) {
-		this.path = path;
-		this.sentence = this.replaceColor(sentence);
+		this.path = new StringBuilder(path);
+		this.sentence = new StringBuilder(this.replaceColor(sentence));
 	}
 
 	private String replaceColor(String s) {

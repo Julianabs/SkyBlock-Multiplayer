@@ -305,7 +305,8 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			}
 		}
 	}
-
+	
+	
 	public PlayerInfo readPlayerFile(String playerName) {
 		File f = new File(this.directoryPlayers, playerName);
 		if (!f.exists()) {
@@ -374,18 +375,18 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 				this.configLanguage.loadFromString(contentToRead);
 			}
 
-			boolean missingSentences = false;
+			boolean missing = false;
 			for (Language g : Language.values()) {
-				String path = g.path;
+				String path = g.getPath();
 				if (!this.configLanguage.contains(path)) {
-					this.configLanguage.set(path, g.sentence);
-					missingSentences = true;
+					this.configLanguage.set(path, g.getSentence());
+					missing = true;
 				} else {
-					g.sentence = this.replaceColor(this.configLanguage.getString(path));
+					g.setSentence(this.replaceColor(this.configLanguage.getString(path)));
 				}
 			}
 
-			if (missingSentences) {
+			if (missing) {
 				String contentToSave = this.configLanguage.saveToString();
 				Writer out = new OutputStreamWriter(new FileOutputStream(this.fileLanguage), encoding);
 				out.write(contentToSave);
@@ -450,8 +451,8 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	 */
 	private void writeLanguageConfig() throws IOException {
 		for (Language g : Language.values()) {
-			String path = g.path;
-			this.configLanguage.set(path, g.sentence);
+			String path = g.getPath();
+			this.configLanguage.set(path, g.getSentence());
 		}
 
 		String contentToSave = this.configLanguage.saveToString();
@@ -976,17 +977,17 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		//create signs
 		SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(1, yEnde - 1, 2).setType(Material.SIGN_POST);
 		Sign s1 = (Sign) SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(1, yEnde - 1, 2).getState();
-		s1.setLine(0, Language.MSGS_SIGN1LINE1.sentence);
-		s1.setLine(1, Language.MSGS_SIGN1LINE2.sentence);
-		s1.setLine(2, Language.MSGS_SIGN1LINE3.sentence);
+		s1.setLine(0, Language.MSGS_SIGN1LINE1.getSentence());
+		s1.setLine(1, Language.MSGS_SIGN1LINE2.getSentence());
+		s1.setLine(2, Language.MSGS_SIGN1LINE3.getSentence());
 		s1.update();
 		s1.getBlock().setData((byte) 8);
 		SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(0, yEnde - 1, 2).setType(Material.SIGN_POST);
 		Sign s2 = (Sign) SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(0, yEnde - 1, 2).getState();
-		s2.setLine(0, Language.MSGS_SIGN2LINE1.sentence);
-		s2.setLine(1, Language.MSGS_SIGN2LINE2.sentence);
-		s2.setLine(2, Language.MSGS_SIGN2LINE3.sentence);
-		s2.setLine(3, Language.MSGS_SIGN2LINE4.sentence);
+		s2.setLine(0, Language.MSGS_SIGN2LINE1.getSentence());
+		s2.setLine(1, Language.MSGS_SIGN2LINE2.getSentence());
+		s2.setLine(2, Language.MSGS_SIGN2LINE3.getSentence());
+		s2.setLine(3, Language.MSGS_SIGN2LINE4.getSentence());
 		s2.update();
 		s2.getBlock().setData((byte) 8);
 	}

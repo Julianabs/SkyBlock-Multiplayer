@@ -89,12 +89,12 @@ public class PlayerInteract implements Listener {
 
 						if (i == 0) {
 							if (SkyBlockMultiplayer.getInstance().locationIsOnTower(player.getLocation())) {
-								player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_AREA_OF_SPAWN_TOWER.sentence);
+								player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_AREA_OF_SPAWN_TOWER.getSentence());
 								event.setCancelled(true);
 								return;
 							}
 
-							player.sendMessage(Language.MSGS_AREA_BORDERS.sentence);
+							player.sendMessage(Language.MSGS_AREA_BORDERS.getSentence());
 							event.setCancelled(true);
 							return;
 						}
@@ -110,7 +110,7 @@ public class PlayerInteract implements Listener {
 						}
 
 						if (i == -1) {
-							player.sendMessage(Language.MSGS_AREA_BORDERS.sentence);
+							player.sendMessage(Language.MSGS_AREA_BORDERS.getSentence());
 							event.setCancelled(true);
 							return;
 						}

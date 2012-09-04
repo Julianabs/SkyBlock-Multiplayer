@@ -1,7 +1,6 @@
 package me.lukas.skyblockmultiplayer;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -52,11 +51,7 @@ public class PlayerInfo {
 		// checke, ob playerfile existiert, ansonsten neu erstellen
 
 		this.playerName = new StringBuilder(playerName);
-		try {
-			this.loadPlayerInfo();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		this.loadPlayerInfo();
 		/*
 		this.hasIsland = false;
 		this.isDead = false;
@@ -311,66 +306,66 @@ public class PlayerInfo {
 
 	@SuppressWarnings("unchecked")
 	public void loadPlayerInfo() throws Exception {
-		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
+		YamlConfiguration yamlPlayerData = new YamlConfiguration();
 		File filePlayerData = new File("players", this.playerName + ".yml");
-		yamlPlayerInfo.load(filePlayerData);
+		yamlPlayerData.load(filePlayerData);
 
 		boolean hasIsland = false;
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.HAS_ISLAND.getPath())) {
-			hasIsland = yamlPlayerInfo.getBoolean(EnumPlayerConfig.HAS_ISLAND.getPath());
+		if (yamlPlayerData.contains(EnumPlayerConfig.HAS_ISLAND.getPath())) {
+			hasIsland = yamlPlayerData.getBoolean(EnumPlayerConfig.HAS_ISLAND.getPath());
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.HAS_ISLAND.getPath(), false);
+			yamlPlayerData.set(EnumPlayerConfig.HAS_ISLAND.getPath(), false);
 		}
 		this.hasIsland = hasIsland;
 
 		boolean isOnIsland = false;
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.IS_ON_ISLAND.getPath())) {
-			isOnIsland = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerConfig.IS_ON_ISLAND.getPath()).toString());
+		if (yamlPlayerData.contains(EnumPlayerConfig.IS_ON_ISLAND.getPath())) {
+			isOnIsland = Boolean.parseBoolean(yamlPlayerData.get(EnumPlayerConfig.IS_ON_ISLAND.getPath()).toString());
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.IS_ON_ISLAND.getPath(), false);
+			yamlPlayerData.set(EnumPlayerConfig.IS_ON_ISLAND.getPath(), false);
 		}
 		this.isOnIsland = isOnIsland;
 
 		boolean isDead = false;
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.IS_DEAD.getPath())) {
-			isDead = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerConfig.IS_DEAD.getPath()).toString());
+		if (yamlPlayerData.contains(EnumPlayerConfig.IS_DEAD.getPath())) {
+			isDead = Boolean.parseBoolean(yamlPlayerData.get(EnumPlayerConfig.IS_DEAD.getPath()).toString());
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.IS_DEAD.getPath(), false);
+			yamlPlayerData.set(EnumPlayerConfig.IS_DEAD.getPath(), false);
 		}
 		this.isDead = isDead;
 
 		Location homeLocation = null;
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.HOME_LOCATION.getPath())) {
-			homeLocation = this.parseStringToLocation(yamlPlayerInfo.get(EnumPlayerConfig.HOME_LOCATION.getPath()).toString());
+		if (yamlPlayerData.contains(EnumPlayerConfig.HOME_LOCATION.getPath())) {
+			homeLocation = this.parseStringToLocation(yamlPlayerData.get(EnumPlayerConfig.HOME_LOCATION.getPath()).toString());
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.HOME_LOCATION.getPath(), "");
+			yamlPlayerData.set(EnumPlayerConfig.HOME_LOCATION.getPath(), "");
 		}
 		this.homeLocation = homeLocation;
 
 		Location islandLocation = null;
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_LOCATION.getPath())) {
-			islandLocation = this.parseStringToLocation(yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_LOCATION.getPath()).toString());
+		if (yamlPlayerData.contains(EnumPlayerConfig.ISLAND_LOCATION.getPath())) {
+			islandLocation = this.parseStringToLocation(yamlPlayerData.get(EnumPlayerConfig.ISLAND_LOCATION.getPath()).toString());
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_LOCATION.getPath(), "");
+			yamlPlayerData.set(EnumPlayerConfig.ISLAND_LOCATION.getPath(), "");
 		}
 		this.islandLocation = islandLocation;
 
 		ArrayList<StringBuilder> friends = new ArrayList<StringBuilder>();
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.FRIENDS.getPath())) {
-			for (String friend : (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.FRIENDS.getPath())) {
+		if (yamlPlayerData.contains(EnumPlayerConfig.FRIENDS.getPath())) {
+			for (String friend : (ArrayList<String>) yamlPlayerData.get(EnumPlayerConfig.FRIENDS.getPath())) {
 				friends.add(new StringBuilder(friend));
 			}
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.FRIENDS.getPath(), "");
+			yamlPlayerData.set(EnumPlayerConfig.FRIENDS.getPath(), "");
 		}
 		this.friends = friends;
 
 		int islandFood = 20;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_FOOD.getPath())) {
-				islandFood = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_FOOD.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.ISLAND_FOOD.getPath())) {
+				islandFood = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.ISLAND_FOOD.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_FOOD.getPath(), 20);
+				yamlPlayerData.set(EnumPlayerConfig.ISLAND_FOOD.getPath(), 20);
 			}
 		} catch (Exception e) {
 		}
@@ -378,10 +373,10 @@ public class PlayerInfo {
 
 		int islandHealth = 20;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_HEALTH.getPath())) {
-				islandHealth = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_HEALTH.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.ISLAND_HEALTH.getPath())) {
+				islandHealth = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.ISLAND_HEALTH.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_HEALTH.getPath(), 20);
+				yamlPlayerData.set(EnumPlayerConfig.ISLAND_HEALTH.getPath(), 20);
 			}
 		} catch (Exception e) {
 		}
@@ -389,10 +384,10 @@ public class PlayerInfo {
 
 		int islandExp = 0;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_EXP.getPath())) {
-				islandExp = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_EXP.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.ISLAND_EXP.getPath())) {
+				islandExp = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.ISLAND_EXP.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_EXP.getPath(), 0);
+				yamlPlayerData.set(EnumPlayerConfig.ISLAND_EXP.getPath(), 0);
 			}
 		} catch (Exception e) {
 		}
@@ -400,47 +395,57 @@ public class PlayerInfo {
 
 		int islandLevel = 0;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_LEVEL.getPath())) {
-				islandLevel = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_LEVEL.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.ISLAND_LEVEL.getPath())) {
+				islandLevel = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.ISLAND_LEVEL.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_LEVEL.getPath(), 0);
+				yamlPlayerData.set(EnumPlayerConfig.ISLAND_LEVEL.getPath(), 0);
 			}
 		} catch (Exception e) {
 		}
 		this.islandLevel = islandLevel;
 
 		ItemStack[] islandInventory = new ItemStack[36];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_INVENTORY.getPath())) {
-			ArrayList<String> listIslandInventory = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_INVENTORY.getPath());
-			islandInventory = ItemParser.getItemStackArrayFromList(listIslandInventory, 36);
+		if (yamlPlayerData.contains(EnumPlayerConfig.ISLAND_INVENTORY.getPath())) {
+			ArrayList<String> listIslandInventory = (ArrayList<String>) yamlPlayerData.get(EnumPlayerConfig.ISLAND_INVENTORY.getPath());
+			for (String s : listIslandInventory) {
+				String[] parts = s.split("-");
+				int slot = Integer.parseInt(parts[0]);
+				ItemStack item = ItemParser.getItemStackfromString(parts[1]);
+				islandInventory[slot] = item;
+			}
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), new ArrayList<String>());
+			yamlPlayerData.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), new ArrayList<String>());
 		}
 		this.islandInventory = islandInventory;
 
 		ItemStack[] islandArmor = new ItemStack[4];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_ARMOR.getPath())) {
-			ArrayList<String> listIslandArmor = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_ARMOR.getPath());
-			islandArmor = ItemParser.getItemStackArrayFromList(listIslandArmor, 4);
+		if (yamlPlayerData.contains(EnumPlayerConfig.ISLAND_ARMOR.getPath())) {
+			ArrayList<String> listIslandArmor = (ArrayList<String>) yamlPlayerData.get(EnumPlayerConfig.ISLAND_ARMOR.getPath());
+			for (String s : listIslandArmor) {
+				String[] parts = s.split("-");
+				int slot = Integer.parseInt(parts[0]);
+				ItemStack item = ItemParser.getItemStackfromString(parts[1]);
+				islandArmor[slot] = item;
+			}
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), new ArrayList<String>());
+			yamlPlayerData.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), new ArrayList<String>());
 		}
 		this.islandArmor = islandArmor;
 
 		Location oldLocation = null;
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_LOCATION.getPath())) {
-			oldLocation = this.parseStringToLocation(yamlPlayerInfo.get(EnumPlayerConfig.OLD_LOCATION.getPath()).toString());
+		if (yamlPlayerData.contains(EnumPlayerConfig.OLD_LOCATION.getPath())) {
+			oldLocation = this.parseStringToLocation(yamlPlayerData.get(EnumPlayerConfig.OLD_LOCATION.getPath()).toString());
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.OLD_LOCATION.getPath(), "");
+			yamlPlayerData.set(EnumPlayerConfig.OLD_LOCATION.getPath(), "");
 		}
 		this.oldLocation = oldLocation;
 
 		int oldFood = 20;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_FOOD.getPath())) {
-				oldFood = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.OLD_FOOD.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.OLD_FOOD.getPath())) {
+				oldFood = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.OLD_FOOD.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.OLD_FOOD.getPath(), 20);
+				yamlPlayerData.set(EnumPlayerConfig.OLD_FOOD.getPath(), 20);
 			}
 		} catch (Exception e) {
 		}
@@ -448,10 +453,10 @@ public class PlayerInfo {
 
 		int oldHealth = 20;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_HEALTH.getPath())) {
-				oldHealth = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.OLD_HEALTH.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.OLD_HEALTH.getPath())) {
+				oldHealth = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.OLD_HEALTH.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.OLD_HEALTH.getPath(), 20);
+				yamlPlayerData.set(EnumPlayerConfig.OLD_HEALTH.getPath(), 20);
 			}
 		} catch (Exception e) {
 		}
@@ -459,10 +464,10 @@ public class PlayerInfo {
 
 		int oldExp = 0;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_EXP.getPath())) {
-				oldExp = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.OLD_EXP.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.OLD_EXP.getPath())) {
+				oldExp = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.OLD_EXP.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.OLD_EXP.getPath(), 0);
+				yamlPlayerData.set(EnumPlayerConfig.OLD_EXP.getPath(), 0);
 			}
 		} catch (Exception e) {
 		}
@@ -470,30 +475,40 @@ public class PlayerInfo {
 
 		int oldLevel = 0;
 		try {
-			if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_LEVEL.getPath())) {
-				oldLevel = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerConfig.OLD_LEVEL.getPath()).toString());
+			if (yamlPlayerData.contains(EnumPlayerConfig.OLD_LEVEL.getPath())) {
+				oldLevel = Integer.parseInt(yamlPlayerData.get(EnumPlayerConfig.OLD_LEVEL.getPath()).toString());
 			} else {
-				yamlPlayerInfo.set(EnumPlayerConfig.OLD_LEVEL.getPath(), 0);
+				yamlPlayerData.set(EnumPlayerConfig.OLD_LEVEL.getPath(), 0);
 			}
 		} catch (Exception e) {
 		}
 		this.oldLevel = oldLevel;
 
 		ItemStack[] oldInventory = new ItemStack[36];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_INVENTORY.getPath())) {
-			ArrayList<String> listOldInventory = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.OLD_INVENTORY.getPath());
-			oldInventory = ItemParser.getItemStackArrayFromList(listOldInventory, 36);
+		if (yamlPlayerData.contains(EnumPlayerConfig.OLD_INVENTORY.getPath())) {
+			ArrayList<String> listOldInventory = (ArrayList<String>) yamlPlayerData.get(EnumPlayerConfig.OLD_INVENTORY.getPath());
+			for (String s : listOldInventory) {
+				String[] parts = s.split("-");
+				int slot = Integer.parseInt(parts[0]);
+				ItemStack item = ItemParser.getItemStackfromString(parts[1]);
+				oldInventory[slot] = item;
+			}
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), new ArrayList<String>());
+			yamlPlayerData.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), new ArrayList<String>());
 		}
 		this.oldInventory = oldInventory;
 
 		ItemStack[] oldArmor = new ItemStack[4];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_ARMOR.getPath())) {
-			ArrayList<String> listOldArmor = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.OLD_ARMOR.getPath());
-			oldArmor = ItemParser.getItemStackArrayFromList(listOldArmor, 4);
+		if (yamlPlayerData.contains(EnumPlayerConfig.OLD_ARMOR.getPath())) {
+			ArrayList<String> listOldArmor = (ArrayList<String>) yamlPlayerData.get(EnumPlayerConfig.OLD_ARMOR.getPath());
+			for (String s : listOldArmor) {
+				String[] parts = s.split("-");
+				int slot = Integer.parseInt(parts[0]);
+				ItemStack item = ItemParser.getItemStackfromString(parts[1]);
+				oldArmor[slot] = item;
+			}
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.OLD_ARMOR.getPath(), new ArrayList<String>());
+			yamlPlayerData.set(EnumPlayerConfig.OLD_ARMOR.getPath(), new ArrayList<String>());
 		}
 		this.oldArmor = oldArmor;
 
@@ -502,40 +517,19 @@ public class PlayerInfo {
 			
 		}*/
 
-		yamlPlayerInfo.save(filePlayerData);
+		yamlPlayerData.save(filePlayerData);
 	}
 
 	public void savePlayerInfo() {
 		YamlConfiguration yamlPlayerData = new YamlConfiguration();
-		File filePlayerInfo = new File("players", this.playerName + ".yml");
-
+		File filePlayerData = new File("players", this.playerName + ".yml");
+		
 		yamlPlayerData.set(EnumPlayerConfig.HAS_ISLAND.getPath(), this.hasIsland);
 		yamlPlayerData.set(EnumPlayerConfig.IS_ON_ISLAND.getPath(), this.isOnIsland);
 		yamlPlayerData.set(EnumPlayerConfig.IS_DEAD.getPath(), this.isDead);
-		yamlPlayerData.set(EnumPlayerConfig.HOME_LOCATION.getPath(), this.getStringFromLocation(this.homeLocation));
-		yamlPlayerData.set(EnumPlayerConfig.ISLAND_LOCATION.getPath(), this.getStringFromLocation(this.islandLocation));
-		/** Do-TO **/
-		// yamlPlayerData.set(EnumPlayerConfig.FRIENDS.getPath(), ); 
-		yamlPlayerData.set(EnumPlayerConfig.ISLAND_FOOD.getPath(), "" + this.islandFood);
-		yamlPlayerData.set(EnumPlayerConfig.ISLAND_HEALTH.getPath(), "" + this.islandHealth);
-		yamlPlayerData.set(EnumPlayerConfig.ISLAND_EXP.getPath(), "" + this.islandExp);
-		yamlPlayerData.set(EnumPlayerConfig.ISLAND_LEVEL.getPath(), "" + this.islandLevel);
-		yamlPlayerData.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), ItemParser.getListFromItemStackArray(this.islandInventory));
-		yamlPlayerData.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), ItemParser.getListFromItemStackArray(this.islandArmor));
-		yamlPlayerData.set(EnumPlayerConfig.OLD_LOCATION.getPath(), this.getStringFromLocation(this.oldLocation));
-		yamlPlayerData.set(EnumPlayerConfig.OLD_FOOD.getPath(), "" + this.oldFood);
-		yamlPlayerData.set(EnumPlayerConfig.OLD_HEALTH.getPath(), "" + this.oldHealth);
-		yamlPlayerData.set(EnumPlayerConfig.OLD_EXP.getPath(), "" + this.oldExp);
-		yamlPlayerData.set(EnumPlayerConfig.OLD_LEVEL.getPath(), "" + this.oldLevel);
-		yamlPlayerData.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), ItemParser.getListFromItemStackArray(this.oldInventory));
-		yamlPlayerData.set(EnumPlayerConfig.OLD_ARMOR.getPath(), ItemParser.getListFromItemStackArray(this.oldArmor));
-
-		try {
-			yamlPlayerData.save(filePlayerInfo);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		
+		
+		
 	}
 
 }
