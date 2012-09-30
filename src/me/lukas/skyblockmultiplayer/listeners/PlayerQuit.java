@@ -19,7 +19,7 @@ public class PlayerQuit implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = Settings.players.get(player.getName());
+		PlayerInfo pi = Settings.players.get(new StringBuilder(player.getName()));
 
 		if (pi.getIslandLocation() == null) {
 			Settings.players.remove(player.getName());

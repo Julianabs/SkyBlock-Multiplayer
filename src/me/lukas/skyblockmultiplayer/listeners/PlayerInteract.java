@@ -1,11 +1,10 @@
 package me.lukas.skyblockmultiplayer.listeners;
 
-import java.util.HashMap;
-
-import me.lukas.skyblockmultiplayer.CreateNewIsland;
+import me.lukas.skyblockmultiplayer.CreateIsland;
+import me.lukas.skyblockmultiplayer.GameMode;
+import me.lukas.skyblockmultiplayer.IslandInfo;
 import me.lukas.skyblockmultiplayer.Language;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
-import me.lukas.skyblockmultiplayer.PlayerInfo2;
 import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.Permissions;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
@@ -14,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -22,14 +20,16 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlayerInteract implements Listener {
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		Action action = event.getAction();
 		Block b = event.getClickedBlock();
 		ItemStack item = event.getItem();
 
-		if (!Settings.skyBlockOnline) {
+		player.sendMessage("1");
+
+		if (!SkyBlockMultiplayer.settings.getIsOnline()) {
 			return;
 		}
 
@@ -37,11 +37,11 @@ public class PlayerInteract implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = Settings.players.get(player.getName());
+		PlayerInfo pi = Settings.players.get(new StringBuilder(player.getName()));
 		if (pi == null) {
 			pi = SkyBlockMultiplayer.getInstance().readPlayerFile(player.getName());
 			if (pi == null) {
-				return;
+				// return;
 			}
 		}
 
@@ -53,10 +53,10 @@ public class PlayerInteract implements Listener {
 		}
 
 		if (item != null) {
-			if (Settings.gameModeSelected == Settings.GameMode.BUILD) {
-				if (item.getType().equals(Material.ENDER_PEARL)) {
+			if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
+				if (item.getType() == Material.ENDER_PEARL) {
 					if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
-						if (Settings.build_allowEnderpearl) {
+						if (SkyBlockMultiplayer.settings.getAllowEnderPearl()) {
 							if (hasBuildPermission) {
 								return;
 							}
@@ -70,7 +70,9 @@ public class PlayerInteract implements Listener {
 				}
 			}
 
-			if (item.getType().equals(Material.STICK)) {
+			player.sendMessage("called");
+
+			if (item.getType() == Material.ARROW) {
 				if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
 					String owner = null;
 					if (b == null) {
@@ -82,10 +84,12 @@ public class PlayerInteract implements Listener {
 					if (owner == null) {
 						int i = -1;
 						if (b == null) {
-							i = CreateNewIsland.getIslandNumber(player.getLocation());
+							i = CreateIsland.getIslandNumber(player.getLocation());
 						} else {
-							i = CreateNewIsland.getIslandNumber(b.getLocation());
+							i = CreateIsland.getIslandNumber(b.getLocation());
 						}
+
+						player.sendMessage("islandNumber is: " + i);
 
 						if (i == 0) {
 							if (SkyBlockMultiplayer.getInstance().locationIsOnTower(player.getLocation())) {
@@ -104,9 +108,9 @@ public class PlayerInteract implements Listener {
 					} else {
 						int i = -1;
 						if (b == null) {
-							i = CreateNewIsland.getIslandNumber(player.getLocation());
+							i = CreateIsland.getIslandNumber(player.getLocation());
 						} else {
-							i = CreateNewIsland.getIslandNumber(b.getLocation());
+							i = CreateIsland.getIslandNumber(b.getLocation());
 						}
 
 						if (i == -1) {
@@ -118,18 +122,21 @@ public class PlayerInteract implements Listener {
 					}
 
 					player.sendMessage("Owner: " + owner);
-					// get friends
-					if (!Settings.lstPlayerInfo2.containsKey(owner)) {
+
+					// get friends			
+					IslandInfo ii = Settings.islands.get(new StringBuilder(owner));
+
+					if (ii == null) {
 						return;
 					}
+
 					String list = "";
-					HashMap<String, PlayerInfo2> friends = Settings.lstPlayerInfo2.get(owner).getFriends();
 					int counter = 0;
-					for (String name : friends.keySet()) {
+					for (StringBuilder name : ii.getFriends()) {
 						if (counter != 0) {
 							list += ", ";
 						}
-						list += name;
+						list += name.toString();
 						counter++;
 					}
 
@@ -154,7 +161,7 @@ public class PlayerInteract implements Listener {
 			return;
 		}
 
-		if (Settings.gameModeSelected == Settings.GameMode.PVP || !Settings.build_withProtectedArea) {
+		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.settings.getWithProtectedArea()) {
 			return;
 		}
 

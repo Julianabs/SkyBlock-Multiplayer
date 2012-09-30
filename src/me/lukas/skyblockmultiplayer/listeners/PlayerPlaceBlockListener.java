@@ -1,5 +1,6 @@
 package me.lukas.skyblockmultiplayer.listeners;
 
+import me.lukas.skyblockmultiplayer.GameMode;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
 import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.Permissions;
@@ -19,7 +20,7 @@ public class PlayerPlaceBlockListener implements Listener {
 		Player player = event.getPlayer();
 		Block b = event.getBlockPlaced();
 
-		if (!Settings.skyBlockOnline) {
+		if (!SkyBlockMultiplayer.settings.getIsOnline()) {
 			return;
 		}
 
@@ -39,7 +40,7 @@ public class PlayerPlaceBlockListener implements Listener {
 			}
 		}
 
-		if (Settings.gameModeSelected == Settings.GameMode.PVP || !Settings.build_withProtectedArea) {
+		if (SkyBlockMultiplayer.settings.getGameMode()== GameMode.PVP || !SkyBlockMultiplayer.settings.getWithProtectedArea()) {
 			return;
 		}
 

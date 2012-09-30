@@ -1,5 +1,6 @@
 package me.lukas.skyblockmultiplayer.listeners;
 
+import me.lukas.skyblockmultiplayer.GameMode;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
 import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
@@ -21,17 +22,17 @@ public class PlayerRespawn implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = Settings.players.get(player.getName());
+		PlayerInfo pi = Settings.players.get(new StringBuilder(player.getName()));
 		if (pi == null) {
 			pi = SkyBlockMultiplayer.getInstance().readPlayerFile(player.getName());
 			if (pi == null) {
 				event.setRespawnLocation(player.getWorld().getSpawnLocation());
 				return;
 			}
-			Settings.players.put(player.getName(), pi);
+			Settings.players.put(new StringBuilder(player.getName()), pi);
 		}
 
-		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player) || Settings.gameModeSelected == Settings.GameMode.PVP || pi.getIslandLocation() == null) {
+		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player) || SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || pi.getIslandLocation() == null) {
 			player.getInventory().setContents(pi.getOldInventory());
 			player.getInventory().setArmorContents(pi.getOldArmor());
 			player.setExp(pi.getOldExp());
@@ -45,7 +46,7 @@ public class PlayerRespawn implements Listener {
 			return;
 		}
 
-		if (Settings.gameModeSelected == Settings.GameMode.BUILD && Settings.build_respawnWithInventory) {
+		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD && SkyBlockMultiplayer.settings.getRespawnWithInventory()) {
 			if (!SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && pi.getIslandLocation() != null) {
 				player.getInventory().setContents(pi.getIslandInventory());
 				player.getInventory().setArmorContents(pi.getIslandArmor());
@@ -92,7 +93,7 @@ public class PlayerRespawn implements Listener {
 			}
 		}
 
-		if (Settings.gameModeSelected == Settings.GameMode.BUILD) {
+		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
 			if (!SkyBlockMultiplayer.getInstance().playerIsOnTower(player)) {
 				if (pi.getHomeLocation() == null) {
 					event.setRespawnLocation(pi.getIslandLocation());
