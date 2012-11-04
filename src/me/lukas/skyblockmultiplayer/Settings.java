@@ -200,7 +200,14 @@ public class Settings {
 	}
 
 	public PlayerInfo getPlayerInfo(String playerName) {
-		return players.get(new StringBuilder(playerName));
+		PlayerInfo pi = players.get(new StringBuilder(playerName));
+		if (pi == null) {
+			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(playerName);
+			if (pi != null) {
+				this.addPlayer(playerName, pi);
+			}
+		}
+		return pi;
 	}
 
 	public void addPlayer(String playerName, PlayerInfo pi) {
@@ -220,7 +227,15 @@ public class Settings {
 	}
 
 	public IslandInfo getIslandInfo(int islandNumber) {
-		return this.islands.get(islandNumber);
+		if (islandNumber == 0) return null;
+		IslandInfo ii = this.islands.get(islandNumber);
+		if (ii == null) {
+			ii = SkyBlockMultiplayer.getInstance().loadIslandInfo(islandNumber + ".yml");
+			if (ii != null) {
+				this.addIslandInfo(ii);
+			}
+		}
+		return ii;
 	}
 
 	public void addIslandInfo(IslandInfo ii) {

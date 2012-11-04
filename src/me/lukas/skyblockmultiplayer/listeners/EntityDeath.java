@@ -18,7 +18,7 @@ public class EntityDeath implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		Entity ent = event.getEntity();
-		if (ent.getType() !=  EntityType.PLAYER) {
+		if (ent.getType() != EntityType.PLAYER) {
 			return;
 		}
 
@@ -29,11 +29,7 @@ public class EntityDeath implements Listener {
 
 		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
-			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
-			if (pi == null) {
-				return;
-			}
-			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+			return;
 		}
 
 		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player)) {

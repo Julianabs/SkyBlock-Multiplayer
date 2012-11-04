@@ -36,14 +36,9 @@ public class PlayerInteract implements Listener {
 
 		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
-			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
-			if (pi == null) {
-				event.setCancelled(true);
-				return;
-			}
-			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+			event.setCancelled(true);
+			return;
 		}
-
 
 		boolean hasBuildPermission = false;
 		if (b == null) {
@@ -78,6 +73,8 @@ public class PlayerInteract implements Listener {
 					} else {
 						owner = SkyBlockMultiplayer.getOwner(b.getLocation());
 					}
+					
+					System.out.println("called");
 
 					if (owner.equals("")) {
 						int i = -1;
@@ -86,8 +83,6 @@ public class PlayerInteract implements Listener {
 						} else {
 							i = CreateIsland.getIslandNumber(b.getLocation());
 						}
-
-						player.sendMessage("islandNumber is: " + i);
 
 						if (i == 0) {
 							if (SkyBlockMultiplayer.getInstance().locationIsOnTower(player.getLocation())) {
@@ -129,13 +124,14 @@ public class PlayerInteract implements Listener {
 					}
 
 					String list = "";
-					int counter = 0;
-					for (StringBuilder name : ii.getFriends()) {
-						if (counter != 0) {
+					boolean first = true;
+					for (String name : ii.getFriends()) {
+						if (first) {
+							first = false;
+						} else {
 							list += ", ";
 						}
-						list += name.toString();
-						counter++;
+						list += name;
 					}
 
 					player.sendMessage("Friends: " + list);

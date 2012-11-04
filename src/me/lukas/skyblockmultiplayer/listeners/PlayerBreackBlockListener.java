@@ -28,6 +28,8 @@ public class PlayerBreackBlockListener implements Listener {
 		if (Permissions.SKYBLOCK_BUILD.has(player)) {
 			return;
 		}
+		
+		System.out.println("called perm");
 
 		if (b.getLocation().getBlockX() >= -20 && b.getLocation().getBlockX() <= 20) {
 			if (b.getLocation().getBlockZ() >= -20 && b.getLocation().getBlockZ() <= 20) {
@@ -43,11 +45,7 @@ public class PlayerBreackBlockListener implements Listener {
 		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
 			PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 			if (pi == null) { // Check, if player is in playerlist
-				pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
-				if (pi == null) {
-					return;
-				}
-				SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+				return;
 			}
 
 			if (SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation())) {

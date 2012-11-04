@@ -23,12 +23,8 @@ public class PlayerRespawn implements Listener {
 
 		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
-			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
-			if (pi == null) {
-				event.setRespawnLocation(player.getWorld().getSpawnLocation());
-				return;
-			}
-			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+			event.setRespawnLocation(player.getWorld().getSpawnLocation());
+			return;
 		}
 
 		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player) || SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || pi.getIslandLocation() == null) {

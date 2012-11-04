@@ -39,11 +39,7 @@ public class PlayerTeleport implements Listener {
 
 		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
-			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
-			if (pi == null) {
-				return;
-			}
-			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+			return;
 		}
 
 		if (event.getCause().equals(TeleportCause.ENDER_PEARL)) {

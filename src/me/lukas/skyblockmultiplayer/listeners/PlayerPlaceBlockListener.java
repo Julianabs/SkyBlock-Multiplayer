@@ -39,18 +39,14 @@ public class PlayerPlaceBlockListener implements Listener {
 			}
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode()== GameMode.PVP || !SkyBlockMultiplayer.settings.getWithProtectedArea()) {
+		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.settings.getWithProtectedArea()) {
 			return;
 		}
 
 		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
-			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
-			if (pi == null) {
-				event.setCancelled(true);
-				return;
-			}
-			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+			event.setCancelled(true);
+			return;
 		}
 
 		if (SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation())) {

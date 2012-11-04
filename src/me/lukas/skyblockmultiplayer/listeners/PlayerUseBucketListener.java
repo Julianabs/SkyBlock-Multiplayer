@@ -44,11 +44,7 @@ public class PlayerUseBucketListener implements Listener {
 		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
 			PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 			if (pi == null) { // Check, if player is in playerlist
-				pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
-				if (pi == null) {
-					return;
-				}
-				SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+				return;
 			}
 
 			if (SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation())) {

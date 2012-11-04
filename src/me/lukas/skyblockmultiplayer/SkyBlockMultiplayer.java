@@ -252,6 +252,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 				IslandInfo ii = this.loadIslandInfo(f);
 				if (ii != null) {
 					settings.addIslandInfo(ii);
+					System.out.println("aded island from " + ii.getIslandOwner());
 				}
 			}
 		}
@@ -261,6 +262,9 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	public IslandInfo loadIslandInfo(String island) {
 		YamlConfiguration yamlIslandInfo = new YamlConfiguration();
 		File fileIslandInfo = new File(this.directoryIslands, island);
+		if (!fileIslandInfo.exists()) {
+			return null;			
+		}
 		try {
 			yamlIslandInfo.load(fileIslandInfo);
 		} catch (Exception e) {
@@ -302,10 +306,8 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			yamlIslandInfo.set(EnumIslandInfo.FRIENDS.getPath(), ii.getFriends());
 		}
 
-		for (String s : friends) {
-			ii.addFriend(new StringBuilder(s));
-		}
-
+		ii.setFriends(friends);
+		
 		try {
 			yamlIslandInfo.save(fileIslandInfo);
 		} catch (IOException e) {
@@ -323,12 +325,8 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		yamlIslandInfo.set(EnumIslandInfo.ISLAND_OWNER.getPath(), ii.getIslandOwner());
 		yamlIslandInfo.set(EnumIslandInfo.ISLAND_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getIslandLocation()));
 		yamlIslandInfo.set(EnumIslandInfo.HOME_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getHomeLocation()));
-
-		ArrayList<String> friends = new ArrayList<String>();
-		for (StringBuilder s : ii.getFriends()) {
-			friends.add(s.toString());
-		}
-		yamlIslandInfo.set(EnumIslandInfo.FRIENDS.getPath(), friends);
+		
+		yamlIslandInfo.set(EnumIslandInfo.FRIENDS.getPath(), ii.getFriends());
 		try {
 			yamlIslandInfo.save(filePlayerInfo);
 		} catch (IOException e) {
@@ -350,7 +348,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 					String playerName = pi.getPlayerName();
 
 					Player playerOnline = this.getServer().getPlayer(playerName);
-					if (!playerOnline.isOnline() || pi.getIslandLocation() == null || !playerOnline.getWorld().getName().equalsIgnoreCase(settings.getWorldName())) {
+					if (playerOnline == null || !playerOnline.isOnline() || pi.getIslandLocation() == null || !playerOnline.getWorld().getName().equalsIgnoreCase(settings.getWorldName())) {
 						continue;
 					}
 
@@ -359,7 +357,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			}
 		}
 	}
-
+// TODO: Add save of IslandInfos in methods...
 	@SuppressWarnings("unchecked")
 	public PlayerInfo loadPlayerInfo(String playerName) {
 		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
@@ -387,7 +385,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		pi.setIslandInfo(settings.getIslandInfo(ownsIslandNr));
 
 		// Check consistency
-		if (!pi.getHasIsland() && !pi.getIslandInfo().isIslandOwner(playerName)) {
+		if (pi.getHasIsland() && !pi.getIslandInfo().isIslandOwner(playerName)) {
 			pi.setIslandInfo(null);
 		}
 
@@ -403,7 +401,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		// Go through buildlist with Islandnr to get IslandInfos
 		for (int islandnr : builtlist) {
 			IslandInfo friend = settings.getIslandInfo(islandnr);
-			if (friend != null && friend.containsFriend(new StringBuilder(playerName))) {
+			if (friend != null && friend.containsFriend(playerName)) {
 				pi.addBuildPermission(islandnr, friend);
 			}
 		}
