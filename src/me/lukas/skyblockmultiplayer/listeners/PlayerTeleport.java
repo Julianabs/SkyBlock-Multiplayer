@@ -2,7 +2,6 @@ package me.lukas.skyblockmultiplayer.listeners;
 
 import me.lukas.skyblockmultiplayer.Language;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
-import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
 
 import org.bukkit.entity.Player;
@@ -38,7 +37,15 @@ public class PlayerTeleport implements Listener {
 			}
 		}
 
-		PlayerInfo pi = Settings.players.get(new StringBuilder(player.getName()));
+		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (pi == null) { // Check, if player is in playerlist
+			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
+			if (pi == null) {
+				return;
+			}
+			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
+		}
+
 		if (event.getCause().equals(TeleportCause.ENDER_PEARL)) {
 			if (SkyBlockMultiplayer.getInstance().locationIsOnTower(event.getTo())) {
 				event.setCancelled(true);

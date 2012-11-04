@@ -39,9 +39,9 @@ public class CreateIsland {
 				if (res != 1) {
 					CreateIsland.createDefaultIsland(l);
 					if (res == 0) {
-						SkyBlockMultiplayer.getInstance().log.warning("Island contains no bedrock.");
+						SkyBlockMultiplayer.getInstance().getLogger().warning("Island contains no bedrock.");
 					} else {
-						SkyBlockMultiplayer.getInstance().log.warning("Island contains too much bedrock.");
+						SkyBlockMultiplayer.getInstance().getLogger().warning("Island contains too much bedrock.");
 					}
 				}
 			} else {
@@ -58,7 +58,7 @@ public class CreateIsland {
 		Location l = CreateIsland.getIslandPosition(nr);
 		CreateIsland.createIslandAtLocation(l);
 		IslandInfo islandInfo = new IslandInfo(nr);
-		Settings.islands.put(nr, islandInfo);
+		SkyBlockMultiplayer.settings.addIslandInfo(islandInfo);
 		return islandInfo;
 	}
 	
@@ -72,9 +72,11 @@ public class CreateIsland {
 		}
 		CreateIsland.createIslandAtLocation(l);
 		IslandInfo islandInfo = new IslandInfo(numberIslands);
-		Settings.islands.put(numberIslands, islandInfo);
+		islandInfo.setIslandLocation(l);
+		SkyBlockMultiplayer.settings.addIslandInfo(islandInfo);
 		return islandInfo;
 	}
+	
 	//public Location Islandlocation;
 
 	/*public CreateIsland(Player player) {
@@ -113,9 +115,9 @@ public class CreateIsland {
 				if (res != 1) {
 					this.createDefaultIsland(l);
 					if (res == 0) {
-						SkyBlockMultiplayer.log.warning("Island contains no bedrock.");
+						SkyBlockMultiplayer.getLogger().warning("Island contains no bedrock.");
 					} else {
-						SkyBlockMultiplayer.log.warning("Island contains too much bedrock.");
+						SkyBlockMultiplayer.getLogger().warning("Island contains too much bedrock.");
 					}
 				}
 			} else {
@@ -134,7 +136,7 @@ public class CreateIsland {
 			int px = locIsland.getBlockX();
 			int py = locIsland.getBlockY() - 3;
 			int pz = locIsland.getBlockZ();
-			if (!new Location(SkyBlockMultiplayer.getSkyBlockWorld(), px, py, pz).getBlock().getType().equals(Material.BEDROCK)) {
+			if (!(new Location(SkyBlockMultiplayer.getSkyBlockWorld(), px, py, pz).getBlock().getType() == Material.BEDROCK)) {
 				break;
 			}
 			amountIslands++;
@@ -145,15 +147,17 @@ public class CreateIsland {
 	public static int getIslandNumber(Location l) {
 		int px = l.getBlockX();
 		int pz = l.getBlockZ();
+		
+		float distance = SkyBlockMultiplayer.settings.getIslandDistance();
 
-		if (px >= 0 && px <= SkyBlockMultiplayer.settings.getIslandDistance()) {
-			if (pz >= 0 && pz <= SkyBlockMultiplayer.settings.getIslandDistance()) {
+		if (px >= -(distance / 2.0) && px <= (distance / 2.0)) {
+			if (pz >= -(distance / 2.0) && pz <= (distance / 2.0)) {
 				return 0;
 			}
 		}
 
-		int xd = (int) Math.round(px / (float) (SkyBlockMultiplayer.settings.getIslandDistance()));
-		int zd = (int) Math.round(pz / (float) (SkyBlockMultiplayer.settings.getIslandDistance()));
+		int xd = (int) Math.round(px / (distance));
+		int zd = (int) Math.round(pz / (distance));
 		int ring = Math.abs(xd) + Math.abs(zd);
 
 		// seite and position auf seite

@@ -5,7 +5,6 @@ import me.lukas.skyblockmultiplayer.GameMode;
 import me.lukas.skyblockmultiplayer.IslandInfo;
 import me.lukas.skyblockmultiplayer.Language;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
-import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.Permissions;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
 
@@ -27,8 +26,6 @@ public class PlayerInteract implements Listener {
 		Block b = event.getClickedBlock();
 		ItemStack item = event.getItem();
 
-		player.sendMessage("1");
-
 		if (!SkyBlockMultiplayer.settings.getIsOnline()) {
 			return;
 		}
@@ -37,13 +34,16 @@ public class PlayerInteract implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = Settings.players.get(new StringBuilder(player.getName()));
-		if (pi == null) {
-			pi = SkyBlockMultiplayer.getInstance().readPlayerFile(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (pi == null) { // Check, if player is in playerlist
+			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
 			if (pi == null) {
-				// return;
+				event.setCancelled(true);
+				return;
 			}
+			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
 		}
+
 
 		boolean hasBuildPermission = false;
 		if (b == null) {
@@ -70,18 +70,16 @@ public class PlayerInteract implements Listener {
 				}
 			}
 
-			player.sendMessage("called");
-
-			if (item.getType() == Material.ARROW) {
+			if (item.getType() == Material.STICK) {
 				if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
-					String owner = null;
+					String owner = "";
 					if (b == null) {
 						owner = SkyBlockMultiplayer.getOwner(player.getLocation());
 					} else {
 						owner = SkyBlockMultiplayer.getOwner(b.getLocation());
 					}
 
-					if (owner == null) {
+					if (owner.equals("")) {
 						int i = -1;
 						if (b == null) {
 							i = CreateIsland.getIslandNumber(player.getLocation());
@@ -124,7 +122,7 @@ public class PlayerInteract implements Listener {
 					player.sendMessage("Owner: " + owner);
 
 					// get friends			
-					IslandInfo ii = Settings.islands.get(new StringBuilder(owner));
+					IslandInfo ii = pi.getIslandInfo();
 
 					if (ii == null) {
 						return;

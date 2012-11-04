@@ -7,7 +7,7 @@ import org.bukkit.World;
 public class LocationParser {
 
 	public static Location parseStringToLocation(String s) {
-		if (s == null || s.trim() == "") {
+		if (s == null || s.trim().equals("")) {
 			return null;
 		}
 		String[] parts = s.split(":");

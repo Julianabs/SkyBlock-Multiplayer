@@ -2,7 +2,6 @@ package me.lukas.skyblockmultiplayer.listeners;
 
 import me.lukas.skyblockmultiplayer.GameMode;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
-import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.Permissions;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
 
@@ -44,9 +43,14 @@ public class PlayerPlaceBlockListener implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = Settings.players.get(player.getName());
-		if (pi == null) {
-			pi = SkyBlockMultiplayer.getInstance().readPlayerFile(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (pi == null) { // Check, if player is in playerlist
+			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
+			if (pi == null) {
+				event.setCancelled(true);
+				return;
+			}
+			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
 		}
 
 		if (SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation())) {

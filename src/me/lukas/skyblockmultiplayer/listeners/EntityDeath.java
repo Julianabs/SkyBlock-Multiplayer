@@ -7,6 +7,7 @@ import me.lukas.skyblockmultiplayer.Language;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,7 +18,7 @@ public class EntityDeath implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		Entity ent = event.getEntity();
-		if (!(ent instanceof Player)) {
+		if (ent.getType() !=  EntityType.PLAYER) {
 			return;
 		}
 
@@ -26,13 +27,13 @@ public class EntityDeath implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = Settings.players.get(new StringBuilder(player.getName()));
+		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
-			pi = SkyBlockMultiplayer.getInstance().readPlayerFile(player.getName());
+			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
 			if (pi == null) {
 				return;
 			}
-			Settings.players.put(new StringBuilder(player.getName()), pi);
+			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
 		}
 
 		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player)) {
@@ -46,7 +47,7 @@ public class EntityDeath implements Listener {
 			event.getDrops().clear();
 			event.setDroppedExp(0);
 
-			SkyBlockMultiplayer.getInstance().writePlayerFile(player.getName(), pi);
+			SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 			return;
 		}
 
@@ -61,7 +62,7 @@ public class EntityDeath implements Listener {
 			event.getDrops().clear();
 			event.setDroppedExp(0);
 
-			SkyBlockMultiplayer.getInstance().writePlayerFile(player.getName(), pi);
+			SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 			return;
 		}
 
@@ -79,14 +80,14 @@ public class EntityDeath implements Listener {
 			return;
 		}
 
-		SkyBlockMultiplayer.getInstance().writePlayerFile(player.getName(), pi);
+		SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 
 		if (Settings.numbersPlayers < 1) {
 			return;
 		}
 		Settings.numbersPlayers--;
 
-		for (PlayerInfo pInfo : Settings.players.values()) {
+		for (PlayerInfo pInfo : SkyBlockMultiplayer.settings.getPlayerInfos().values()) {
 			if (pInfo.getPlayer() != null) {
 				if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
 					pInfo.getPlayer().sendMessage(Language.MSGS_PLAYER_DIED1.getSentence() + Settings.numbersPlayers + Language.MSGS_PLAYER_DIED2.getSentence());
@@ -96,13 +97,13 @@ public class EntityDeath implements Listener {
 
 		if (Settings.numbersPlayers == 1) {
 			String winner = "";
-			for (PlayerInfo pinfo : Settings.players.values()) {
+			for (PlayerInfo pinfo : SkyBlockMultiplayer.settings.getPlayerInfos().values()) {
 				if (pinfo.isDead() == false) {
 					winner = pinfo.getPlayer().getName();
 				}
 			}
 
-			for (PlayerInfo pInfo : Settings.players.values()) {
+			for (PlayerInfo pInfo : SkyBlockMultiplayer.settings.getPlayerInfos().values()) {
 				if (pInfo.getPlayer() != null) {
 					if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
 						pInfo.getPlayer().sendMessage(Language.MSGS_PLAYER_WIN_BROADCAST1.getSentence() + winner + Language.MSGS_PLAYER_WIN_BROADCAST2.getSentence());

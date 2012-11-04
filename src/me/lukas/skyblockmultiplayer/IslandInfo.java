@@ -1,40 +1,28 @@
 package me.lukas.skyblockmultiplayer;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public class IslandInfo {
 
-	private int nr;
+	private int islandNumber;
 	private StringBuilder islandOwner;
 	private ArrayList<StringBuilder> friends;
 	private Location homeLocation;
 	private Location islandLocation;
 
-	public IslandInfo(int islandNr, String islandOwner) { // for new Islands
-		this.nr = islandNr;
-		this.islandOwner = new StringBuilder(islandOwner);
+	public IslandInfo(int islandNr) {
+		this.islandNumber = islandNr;
 		this.friends = new ArrayList<StringBuilder>();
-	}
-
-	public IslandInfo(int islandNr) { // for loading yml files
-		this.nr = islandNr;
-
-		try {
-			this.loadIslandInfo();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public String getIslandOwner() {
 		return this.islandOwner.toString();
+	}
+
+	public void setIslandOwner(String islandOwner) {
+		this.islandOwner = new StringBuilder(islandOwner);
 	}
 
 	public boolean isIslandOwner(String playerName) {
@@ -79,20 +67,19 @@ public class IslandInfo {
 		return this.homeLocation;
 	}
 
-	public int getIslandNr() {
-		return this.nr;
+	public int getIslandNumber() {
+		return this.islandNumber;
 	}
-	
-	
-	public Location getSafeTeleportLocation() {
+
+	/*public Location getSafeTeleportLocation() {
 		if (this.homeLocation != null) {
-		
+
 			if (this.isSafeLocation(this.homeLocation)) {
 				return this.homeLocation;
 			}
 			// b) check if a suitable y exists on this x and z
-			for (int y =  this.homeLocation.getBlockY(); y > 0; y--) {
-				Location n = new Location( this.homeLocation.getWorld(),  this.homeLocation.getBlockX(), y,  this.homeLocation.getBlockZ());
+			for (int y = this.homeLocation.getBlockY(); y > 0; y--) {
+				Location n = new Location(this.homeLocation.getWorld(), this.homeLocation.getBlockX(), y, this.homeLocation.getBlockZ());
 				if (this.isSafeLocation(n)) {
 					return n;
 				}
@@ -106,7 +93,7 @@ public class IslandInfo {
 		}
 
 		// c) check island Location
-		
+
 		if (this.isSafeLocation(this.islandLocation)) {
 			return this.islandLocation;
 		}
@@ -150,7 +137,7 @@ public class IslandInfo {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	public void loadIslandInfo() throws Exception {
 		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
 		File fileIslandInfo = new File("islands", this.nr + ".yml");
@@ -193,23 +180,22 @@ public class IslandInfo {
 		}
 
 		yamlPlayerInfo.save(fileIslandInfo);
-	}
+	}*/
 
-	public void saveIslandInfo() throws Exception {
+	/*public void saveIslandInfo() throws Exception {
 		YamlConfiguration yamlIslandInfo = new YamlConfiguration();
 		File filePlayerInfo = new File("islands", this.nr + ".yml");
 
 		yamlIslandInfo.set(EnumIslandInfo.ISLAND_OWNER.getPath(), this.islandOwner.toString());
 		yamlIslandInfo.set(EnumIslandInfo.ISLAND_LOCATION.getPath(), LocationParser.getStringFromLocation(this.islandLocation));
 		yamlIslandInfo.set(EnumIslandInfo.HOME_LOCATION.getPath(), LocationParser.getStringFromLocation(this.islandLocation));
-		
+
 		ArrayList<String> friends = new ArrayList<String>();
-		for (StringBuilder s: this.friends) {
+		for (StringBuilder s : this.friends) {
 			friends.add(s.toString());
 		}
 		yamlIslandInfo.set(EnumIslandInfo.FRIENDS.getPath(), friends);
 		yamlIslandInfo.save(filePlayerInfo);
-	}
-	
-	
+	}*/
+
 }

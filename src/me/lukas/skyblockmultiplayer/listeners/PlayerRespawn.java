@@ -2,7 +2,6 @@ package me.lukas.skyblockmultiplayer.listeners;
 
 import me.lukas.skyblockmultiplayer.GameMode;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
-import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
 
 import org.bukkit.Location;
@@ -22,14 +21,14 @@ public class PlayerRespawn implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = Settings.players.get(new StringBuilder(player.getName()));
-		if (pi == null) {
-			pi = SkyBlockMultiplayer.getInstance().readPlayerFile(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (pi == null) { // Check, if player is in playerlist
+			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(player.getName());
 			if (pi == null) {
 				event.setRespawnLocation(player.getWorld().getSpawnLocation());
 				return;
 			}
-			Settings.players.put(new StringBuilder(player.getName()), pi);
+			SkyBlockMultiplayer.settings.addPlayer(player.getName(), pi);
 		}
 
 		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player) || SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || pi.getIslandLocation() == null) {
@@ -40,7 +39,7 @@ public class PlayerRespawn implements Listener {
 			player.setFoodLevel(pi.getOldFood());
 			player.setHealth(player.getMaxHealth());
 
-			SkyBlockMultiplayer.getInstance().writePlayerFile(player.getName(), pi);
+			SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 
 			event.setRespawnLocation(player.getWorld().getSpawnLocation());
 			return;
@@ -55,7 +54,7 @@ public class PlayerRespawn implements Listener {
 				player.setFoodLevel(20);
 				player.setHealth(player.getMaxHealth());
 
-				SkyBlockMultiplayer.getInstance().writePlayerFile(player.getName(), pi);
+				SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 
 				// check if bedrock is still there
 				int px = pi.getIslandLocation().getBlockX();
@@ -72,7 +71,7 @@ public class PlayerRespawn implements Listener {
 					player.setFoodLevel(pi.getOldFood());
 					player.setHealth(player.getMaxHealth());
 
-					SkyBlockMultiplayer.getInstance().writePlayerFile(player.getName(), pi);
+					SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 					return;
 				}
 

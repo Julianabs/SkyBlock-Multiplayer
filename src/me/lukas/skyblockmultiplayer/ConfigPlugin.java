@@ -8,7 +8,7 @@ public enum ConfigPlugin {
 	OPTIONS_ALLOWCONTENT("options.allowContent", false),
 	OPTIONS_LANGUAGE("options.language", "english"),
 	OPTIONS_GAMEMODE("options.gameMode", "build"),
-	OPTIONS_WORLDNAME("options.worldName", SkyBlockMultiplayer.getInstance().settings.getWorldName()),
+	OPTIONS_WORLDNAME("options.worldName", SkyBlockMultiplayer.settings.getWorldName()),
 	OPTIONS_CLOSED("options.closed", false),
 	OPTIONS_MESSAGES_OUTSIDE("options.messagesOutside", false),
 	OPTIONS_REMOVECREATURESBYTELEPORT("options.removeCreaturesByTeleport", true),

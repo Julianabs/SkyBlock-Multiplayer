@@ -2,6 +2,7 @@ package me.lukas.skyblockmultiplayer;
 
 import java.util.ArrayList;
 
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +37,7 @@ public class ItemParser {
 			String[] parts = s.split("-");
 			int slot = Integer.parseInt(parts[0]);
 			ItemStack item = ItemParser.getItemStackfromString(parts[1]);
-			items[slot] = item;
+			items[slot++] = item;
 		}
 		return items;
 	}
@@ -46,7 +47,7 @@ public class ItemParser {
 
 		int counter = 0;
 		for (ItemStack item : items) {
-			if (item == null) {
+			if (item == null || item.getType() == Material.AIR) {
 				counter++;
 				continue;
 			}
@@ -68,7 +69,7 @@ public class ItemParser {
 		for (String thing : s.split(";")) {
 			String[] sp = thing.split(":");
 			if (sp.length != 2)
-				SkyBlockMultiplayer.getInstance().log.warning("error, wrong type size");
+				SkyBlockMultiplayer.getInstance().getLogger().warning("error, wrong type size");
 			String name = sp[0];
 
 			if (name.equals("id")) {
@@ -85,7 +86,7 @@ public class ItemParser {
 				for (String enchantment : sp[1].split(" ")) {
 					String[] prop = enchantment.split("#");
 					if (prop.length != 2)
-						SkyBlockMultiplayer.getInstance().log.warning("error, wrong enchantmenttype length");
+						SkyBlockMultiplayer.getInstance().getLogger().warning("error, wrong enchantmenttype length");
 					if (prop[0].equals("eid")) {
 						enchId = Integer.parseInt(prop[1]);
 					} else if (prop[0].equals("elevel")) {
@@ -95,7 +96,7 @@ public class ItemParser {
 				}
 
 			} else {
-				SkyBlockMultiplayer.getInstance().log.warning("error, unknown itemvalue");
+				SkyBlockMultiplayer.getInstance().getLogger().warning("error, unknown itemvalue");
 			}
 		}
 		return x;

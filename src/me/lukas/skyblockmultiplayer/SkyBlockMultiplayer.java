@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 import me.lukas.skyblockmultiplayer.listeners.EntityDeath;
 import me.lukas.skyblockmultiplayer.listeners.PlayerBreackBlockListener;
@@ -40,13 +39,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class SkyBlockMultiplayer extends JavaPlugin {
-	public PluginDescriptionFile pluginFile;
-	public Logger log;
 
 	public static World skyBlockWorld = null;
 	private static SkyBlockMultiplayer instance;
@@ -60,22 +56,20 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	public File fileLanguage;
 
 	private File directoryPlayers;
+	private File directoryIslands;
 
 	public String pName;
 
 	@Override
 	public void onDisable() {
-		this.log.info("v" + pluginFile.getVersion() + " disabled.");
+		this.getLogger().info("v" + getDescription().getVersion() + " disabled.");
 	}
 
 	@Override
 	public void onEnable() {
 		SkyBlockMultiplayer.instance = this;
 
-		this.pluginFile = this.getDescription();
-		this.log = this.getLogger();
-
-		this.pName = ChatColor.WHITE + "[" + ChatColor.GREEN + this.pluginFile.getName() + ChatColor.WHITE + "] ";
+		this.pName = ChatColor.WHITE + "[" + ChatColor.GREEN + this.getDescription().getName() + ChatColor.WHITE + "] ";
 
 		// register events
 		this.registerEvents();
@@ -96,17 +90,24 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			e.printStackTrace();
 		}
 
-		/*this.directoryPlayers = new File(this.getDataFolder() + File.separator + "players");
+		this.directoryIslands = new File(this.getDataFolder() + File.separator + "islands");
+		if (!this.directoryIslands.exists()) {
+			this.directoryIslands.mkdir();
+		} else {
+			this.loadIslandFiles();
+		}
+
+		this.directoryPlayers = new File(this.getDataFolder() + File.separator + "players");
 		if (!this.directoryPlayers.exists()) {
 			this.directoryPlayers.mkdir();
 		} else {
 			this.loadPlayerFiles();
-		}*/
+		}
 
 		// register command
 		this.getCommand("skyblock").setExecutor(new SkyBlockCommand());
 
-		this.log.info("v" + pluginFile.getVersion() + " enabled.");
+		this.getLogger().info("v" + getDescription().getVersion() + " enabled.");
 	}
 
 	public static SkyBlockMultiplayer getInstance() {
@@ -148,7 +149,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			settings.setRespawnWithInventory(true);
 			settings.setWithProtectedArea(false);
 			settings.setAllowEnderPearl(false);
-			settings.setWorldName(this.pluginFile.getName());
+			settings.setWorldName(this.getDescription().getName());
 			settings.setRemoveCreaturesByTeleport(true);
 			settings.setIslandSchematic("");
 			settings.setIslandYPosition(64);
@@ -237,7 +238,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			settings.setWithProtectedArea(Boolean.parseBoolean(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_BUILD_WITHPROTECTEDAREA.path, true, true)));
 			settings.setAllowEnderPearl(Boolean.parseBoolean(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_BUILD_ALLOWENDERPEARL.path, false, true)));
 			settings.setWithProtectedBorder(Boolean.parseBoolean(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_BUILD_WITHPROTECTEDBORDER.path, true, true)));
-			settings.setWorldName(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_WORLDNAME.path, this.pluginFile.getName(), true));
+			settings.setWorldName(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_WORLDNAME.path, this.getDescription().getName(), true));
 			settings.setIsLocked(Boolean.parseBoolean(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_CLOSED.path, false, true)));
 			settings.setRemoveCreaturesByTeleport(Boolean.parseBoolean(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_REMOVECREATURESBYTELEPORT.path, true, true)));
 			settings.setIslandSchematic(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_SCHEMATIC_ISLAND_FILENAME.path, "", true));
@@ -245,58 +246,362 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 	}
 
-	/**
-	 * Load axll informations from player who exists in folder players and who have a island.
-	 * 
-	 */
-	public void loadPlayerFiles() {
-		for (String f : new File(this.directoryPlayers.toString()).list()) {
-			if (new File(this.directoryPlayers, f).isFile()) {
-				//TODO: remove .yml from f
-				PlayerInfo pi = new PlayerInfo(f);
-				if (pi != null) {
-					// add player, if missing
-					String playerName = pi.getPlayerName();
-
-					Player playerOnline = this.getServer().getPlayer(playerName);
-					if (pi.getIslandLocation() == null) {
-						continue;
-					}
-
-					/*if (!Settings.lstPlayerInfo2.containsKey(playerName)) {
-						Settings.lstPlayerInfo2.put(playerName, new PlayerInfo2(playerName, pi.getIslandLocation()));
-						Settings.lstPlayerInfo2.get(playerName).setHomeLocation(pi.getHomeLocation());
-					} else {
-						Settings.lstPlayerInfo2.get(playerName).setIslandLocation(pi.getIslandLocation());
-						Settings.lstPlayerInfo2.get(playerName).setHomeLocation(pi.getHomeLocation());
-					}
-					PlayerInfo2 player = Settings.lstPlayerInfo2.get(playerName);*9/
-
-					// Add friends
-					/**
-					 * TODO: add friends
-					 */
-					/*for (String friendName : pi.getFriends()) {
-						if (!Settings.lstPlayerInfo2.containsKey(friendName)) {
-							Settings.lstPlayerInfo2.put(friendName, new PlayerInfo2(friendName, null));
-						}
-						PlayerInfo2 friend = Settings.lstPlayerInfo2.get(friendName);
-						// Add Permissions
-						player.addFriendsToOwnIsland(friend);
-						friend.addOwnBuildPermission(player);
-					}
-
-					Settings.islandsAndOwners.put(pi.getPlayerName(), pi.getIslandLocation());
-					if (playerOnline == null || !playerOnline.getWorld().getName().equals(SkyBlockMultiplayer.getSkyBlockWorld().getName())) {
-						continue;
-					}
-					Settings.players.put(playerName, pi);*/
+	public void loadIslandFiles() {
+		for (String f : new File(this.directoryIslands.getAbsolutePath()).list()) {
+			if (new File(this.directoryIslands, f).isFile()) {
+				IslandInfo ii = this.loadIslandInfo(f);
+				if (ii != null) {
+					settings.addIslandInfo(ii);
 				}
 			}
 		}
 	}
 
-	
+	@SuppressWarnings("unchecked")
+	public IslandInfo loadIslandInfo(String island) {
+		YamlConfiguration yamlIslandInfo = new YamlConfiguration();
+		File fileIslandInfo = new File(this.directoryIslands, island);
+		try {
+			yamlIslandInfo.load(fileIslandInfo);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		int islandNumber = Integer.parseInt(fileIslandInfo.getName().replace(".yml", ""));
+		IslandInfo ii = new IslandInfo(islandNumber);
+
+		String islandOwner = "";
+		if (yamlIslandInfo.contains(EnumIslandInfo.ISLAND_OWNER.getPath())) {
+			islandOwner = yamlIslandInfo.get(EnumIslandInfo.ISLAND_OWNER.getPath()).toString();
+		} else {
+			yamlIslandInfo.set(EnumIslandInfo.ISLAND_OWNER.getPath(), false);
+		}
+		ii.setIslandOwner(islandOwner);
+
+		Location islandLocation = null;
+		if (yamlIslandInfo.contains(EnumIslandInfo.ISLAND_LOCATION.getPath())) {
+			islandLocation = LocationParser.parseStringToLocation(yamlIslandInfo.get(EnumIslandInfo.ISLAND_LOCATION.getPath()).toString());
+		} else {
+			yamlIslandInfo.set(EnumIslandInfo.ISLAND_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getIslandLocation()));
+		}
+		ii.setIslandLocation(islandLocation);
+
+		Location homeLocation = null;
+		if (yamlIslandInfo.contains(EnumIslandInfo.HOME_LOCATION.getPath())) {
+			islandLocation = LocationParser.parseStringToLocation(yamlIslandInfo.get(EnumIslandInfo.HOME_LOCATION.getPath()).toString());
+		} else {
+			yamlIslandInfo.set(EnumIslandInfo.HOME_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getHomeLocation()));
+		}
+		ii.setHomeLocation(homeLocation);
+
+		ArrayList<String> friends = new ArrayList<String>();
+		if (yamlIslandInfo.contains(EnumIslandInfo.FRIENDS.getPath())) {
+			friends = (ArrayList<String>) yamlIslandInfo.get(EnumIslandInfo.FRIENDS.getPath());
+		} else {
+			yamlIslandInfo.set(EnumIslandInfo.FRIENDS.getPath(), ii.getFriends());
+		}
+
+		for (String s : friends) {
+			ii.addFriend(new StringBuilder(s));
+		}
+
+		try {
+			yamlIslandInfo.save(fileIslandInfo);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		return ii;
+	}
+
+	public void saveIslandInfo(IslandInfo ii) {
+		YamlConfiguration yamlIslandInfo = new YamlConfiguration();
+		File filePlayerInfo = new File(this.directoryIslands, ii.getIslandNumber() + ".yml");
+
+		yamlIslandInfo.set(EnumIslandInfo.ISLAND_OWNER.getPath(), ii.getIslandOwner());
+		yamlIslandInfo.set(EnumIslandInfo.ISLAND_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getIslandLocation()));
+		yamlIslandInfo.set(EnumIslandInfo.HOME_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getHomeLocation()));
+
+		ArrayList<String> friends = new ArrayList<String>();
+		for (StringBuilder s : ii.getFriends()) {
+			friends.add(s.toString());
+		}
+		yamlIslandInfo.set(EnumIslandInfo.FRIENDS.getPath(), friends);
+		try {
+			yamlIslandInfo.save(filePlayerInfo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Load all informations from player who exists in folder players and who have a island.
+	 * 
+	 */
+	public void loadPlayerFiles() {
+		for (String f : new File(this.directoryPlayers.getAbsolutePath()).list()) {
+			if (new File(this.directoryPlayers, f).isFile()) {
+
+				PlayerInfo pi = this.loadPlayerInfo(f.replace(".yml", ""));
+				if (pi != null) {
+					// add player, if missing
+					String playerName = pi.getPlayerName();
+
+					Player playerOnline = this.getServer().getPlayer(playerName);
+					if (!playerOnline.isOnline() || pi.getIslandLocation() == null || !playerOnline.getWorld().getName().equalsIgnoreCase(settings.getWorldName())) {
+						continue;
+					}
+
+					settings.addPlayer(playerName, pi);
+				}
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public PlayerInfo loadPlayerInfo(String playerName) {
+		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
+		File filePlayerInfo = new File(this.directoryPlayers, playerName + ".yml");
+		if (!filePlayerInfo.exists()) {
+			return null;
+		}
+
+		try {
+			yamlPlayerInfo.load(filePlayerInfo);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		PlayerInfo pi = new PlayerInfo(playerName);
+
+		// Find own Island
+		int ownsIslandNr = -1;
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_NUMBER.getPath())) {
+			ownsIslandNr = yamlPlayerInfo.getInt(EnumPlayerInfo.ISLAND_NUMBER.getPath());
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_NUMBER.getPath(), ownsIslandNr);
+		}
+		pi.setIslandInfo(settings.getIslandInfo(ownsIslandNr));
+
+		// Check consistency
+		if (!pi.getHasIsland() && !pi.getIslandInfo().isIslandOwner(playerName)) {
+			pi.setIslandInfo(null);
+		}
+
+		// Find Buildpermissions
+		// buildPermissions = new HashMap<Integer, IslandInfo>();
+
+		ArrayList<Integer> builtlist = new ArrayList<Integer>();
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_BUILTLIST.getPath())) {
+			builtlist = (ArrayList<Integer>) yamlPlayerInfo.getList(EnumPlayerInfo.ISLAND_BUILTLIST.getPath());
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_BUILTLIST.getPath(), builtlist);
+		}
+		// Go through buildlist with Islandnr to get IslandInfos
+		for (int islandnr : builtlist) {
+			IslandInfo friend = settings.getIslandInfo(islandnr);
+			if (friend != null && friend.containsFriend(new StringBuilder(playerName))) {
+				pi.addBuildPermission(islandnr, friend);
+			}
+		}
+
+		boolean isOnIsland = false;
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.IS_ON_ISLAND.getPath())) {
+			isOnIsland = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerInfo.IS_ON_ISLAND.getPath()).toString());
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.IS_ON_ISLAND.getPath(), false);
+		}
+		pi.setIsOnIsland(isOnIsland);
+
+		boolean isDead = false;
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.IS_DEAD.getPath())) {
+			isDead = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerInfo.IS_DEAD.getPath()).toString());
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.IS_DEAD.getPath(), false);
+		}
+		pi.setDead(isDead);
+
+		int islandFood = 20;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_FOOD.getPath())) {
+				islandFood = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.ISLAND_FOOD.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_FOOD.getPath(), 20);
+			}
+		} catch (Exception e) {
+		}
+		pi.setIslandFood(islandFood);
+
+		int islandHealth = 20;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_HEALTH.getPath())) {
+				islandHealth = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.ISLAND_HEALTH.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_HEALTH.getPath(), 20);
+			}
+		} catch (Exception e) {
+		}
+		pi.setIslandHealth(islandHealth);
+
+		int islandExp = 0;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_EXP.getPath())) {
+				islandExp = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.ISLAND_EXP.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_EXP.getPath(), 0);
+			}
+		} catch (Exception e) {
+		}
+		pi.setIslandExp(islandExp);
+
+		int islandLevel = 0;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_LEVEL.getPath())) {
+				islandLevel = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.ISLAND_LEVEL.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_LEVEL.getPath(), 0);
+			}
+		} catch (Exception e) {
+		}
+		pi.setIslandLevel(islandLevel);
+
+		ItemStack[] islandInventory = new ItemStack[36];
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_INVENTORY.getPath())) {
+			ArrayList<String> listIslandInventory = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerInfo.ISLAND_INVENTORY.getPath());
+			islandInventory = ItemParser.getItemStackArrayFromList(listIslandInventory, 36);
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_INVENTORY.getPath(), new ArrayList<String>());
+		}
+		pi.setIslandInventory(islandInventory);
+
+		ItemStack[] islandArmor = new ItemStack[4];
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.ISLAND_ARMOR.getPath())) {
+			ArrayList<String> listIslandArmor = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerInfo.ISLAND_ARMOR.getPath());
+			islandArmor = ItemParser.getItemStackArrayFromList(listIslandArmor, 4);
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_ARMOR.getPath(), new ArrayList<String>());
+		}
+		pi.setIslandArmor(islandArmor);
+
+		Location oldLocation = null;
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.OLD_LOCATION.getPath())) {
+			oldLocation = LocationParser.parseStringToLocation(yamlPlayerInfo.get(EnumPlayerInfo.OLD_LOCATION.getPath()).toString());
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.OLD_LOCATION.getPath(), "");
+		}
+		pi.setOldLocation(oldLocation);
+
+		int oldFood = 20;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.OLD_FOOD.getPath())) {
+				oldFood = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.OLD_FOOD.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.OLD_FOOD.getPath(), 20);
+			}
+		} catch (Exception e) {
+		}
+		pi.setOldFood(oldFood);
+
+		int oldHealth = 20;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.OLD_HEALTH.getPath())) {
+				oldHealth = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.OLD_HEALTH.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.OLD_HEALTH.getPath(), 20);
+			}
+		} catch (Exception e) {
+		}
+		pi.setOldHealth(oldHealth);
+
+		int oldExp = 0;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.OLD_EXP.getPath())) {
+				oldExp = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.OLD_EXP.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.OLD_EXP.getPath(), 0);
+			}
+		} catch (Exception e) {
+		}
+		pi.setOldExp(oldExp);
+
+		int oldLevel = 0;
+		try {
+			if (yamlPlayerInfo.contains(EnumPlayerInfo.OLD_LEVEL.getPath())) {
+				oldLevel = Integer.parseInt(yamlPlayerInfo.get(EnumPlayerInfo.OLD_LEVEL.getPath()).toString());
+			} else {
+				yamlPlayerInfo.set(EnumPlayerInfo.OLD_LEVEL.getPath(), 0);
+			}
+		} catch (Exception e) {
+		}
+		pi.setOldLevel(oldLevel);
+
+		ItemStack[] oldInventory = new ItemStack[36];
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.OLD_INVENTORY.getPath())) {
+			ArrayList<String> listOldInventory = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerInfo.OLD_INVENTORY.getPath());
+			oldInventory = ItemParser.getItemStackArrayFromList(listOldInventory, 36);
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.OLD_INVENTORY.getPath(), new ArrayList<String>());
+		}
+		pi.setOldInventory(oldInventory);
+
+		ItemStack[] oldArmor = new ItemStack[4];
+		if (yamlPlayerInfo.contains(EnumPlayerInfo.OLD_ARMOR.getPath())) {
+			ArrayList<String> listOldArmor = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerInfo.OLD_ARMOR.getPath());
+			oldArmor = ItemParser.getItemStackArrayFromList(listOldArmor, 4);
+		} else {
+			yamlPlayerInfo.set(EnumPlayerInfo.OLD_ARMOR.getPath(), new ArrayList<String>());
+		}
+		pi.setOldArmor(oldArmor);
+
+		/*yamlPlayerData.load(filePlayerData);
+		for (String friend : yamlPlayerData.getConfigurationSection("friends").getKeys(false)) {
+			
+		}*/
+
+		try {
+			yamlPlayerInfo.save(filePlayerInfo);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return pi;
+	}
+
+	public void savePlayerInfo(PlayerInfo pi) {
+		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
+		File filePlayerInfo = new File(this.directoryPlayers, pi.getPlayerName() + ".yml");
+
+		// island info
+		if (pi.getIslandInfo() != null) {
+			yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_NUMBER.getPath(), pi.getIslandInfo().getIslandNumber());
+		}
+
+		yamlPlayerInfo.set(EnumPlayerInfo.IS_ON_ISLAND.getPath(), pi.getIsOnIsland());
+		yamlPlayerInfo.set(EnumPlayerInfo.IS_DEAD.getPath(), pi.isDead());
+		yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_FOOD.getPath(), "" + pi.getIslandFood());
+		yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_HEALTH.getPath(), "" + pi.getIslandHealth());
+		yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_EXP.getPath(), "" + pi.getIslandExp());
+		yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_LEVEL.getPath(), "" + pi.getIslandLevel());
+		yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_INVENTORY.getPath(), ItemParser.getListFromItemStackArray(pi.getIslandInventory()));
+		yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_ARMOR.getPath(), ItemParser.getListFromItemStackArray(pi.getIslandArmor()));
+		yamlPlayerInfo.set(EnumPlayerInfo.OLD_LOCATION.getPath(), LocationParser.getStringFromLocation(pi.getOldLocation()));
+		yamlPlayerInfo.set(EnumPlayerInfo.OLD_FOOD.getPath(), "" + pi.getOldFood());
+		yamlPlayerInfo.set(EnumPlayerInfo.OLD_HEALTH.getPath(), "" + pi.getOldHealth());
+		yamlPlayerInfo.set(EnumPlayerInfo.OLD_EXP.getPath(), "" + pi.getOldExp());
+		yamlPlayerInfo.set(EnumPlayerInfo.OLD_LEVEL.getPath(), "" + pi.getOldLevel());
+		yamlPlayerInfo.set(EnumPlayerInfo.OLD_INVENTORY.getPath(), ItemParser.getListFromItemStackArray(pi.getOldInventory()));
+		yamlPlayerInfo.set(EnumPlayerInfo.OLD_ARMOR.getPath(), ItemParser.getListFromItemStackArray(pi.getOldArmor()));
+		yamlPlayerInfo.set(EnumPlayerInfo.ISLAND_BUILTLIST.getPath(), pi.getBuildListNumbers());
+
+		try {
+			yamlPlayerInfo.save(filePlayerInfo);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Loads the language file, that is setted in conig.yml
@@ -533,7 +838,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 					this.getAllFiles(f.getAbsolutePath());
 				}
 			} catch (Exception ex) {
-				this.log.warning(ex.getMessage());
+				this.getLogger().warning(ex.getMessage());
 			}
 		}
 	}
@@ -589,7 +894,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			return pName;
 		else if (amount > 1)
 			return "0";
-		
+
 		this.getServer().getOfflinePlayers();
 
 		// check PlayerInfo2, also with offline players
@@ -608,12 +913,6 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		return "-1";
 	}
 
-	/**
-	 * Returns a location who 2 blocks are air.
-	 * 
-	 * @param l
-	 * @return
-	 */
 	public Location getYLocation(Location l) {
 		for (int y = 0; y < 254; y++) {
 			int px = l.getBlockX();
@@ -629,18 +928,14 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		return l;
 	}
 
-	public Location getSafeHomeLocation(PlayerInfo p) {
+	public Location getSafeHomeLocation(PlayerInfo pi) {
 		// a) check original location
-		Location home = null;
-		if (p.getHomeLocation() == null) {
-			home = p.getIslandLocation();
-		} else {
-			home = p.getHomeLocation();
-		}
+		Location home = pi.getHomeLocation();
 
 		if (this.isSafeLocation(home)) {
 			return home;
 		}
+
 		// b) check if a suitable y exists on this x and z
 		for (int y = home.getBlockY(); y > 0; y--) {
 			Location n = new Location(home.getWorld(), home.getBlockX(), y, home.getBlockZ());
@@ -656,7 +951,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 
 		// c) check island Location
-		Location island = p.getIslandLocation();
+		Location island = pi.getIslandLocation();
 		if (this.isSafeLocation(island)) {
 			return island;
 		}
@@ -906,7 +1201,10 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 	public static String getOwner(Location l) {
 		int islandNumber = CreateIsland.getIslandNumber(l);
-		return Settings.islands.get(islandNumber).getIslandOwner();
+		if (islandNumber == 0) {
+			return "";
+		}
+		return settings.getIslandInfo(islandNumber).getIslandOwner();
 	}
 
 	public static boolean checkBuildPermission(PlayerInfo pi, Location l) {
@@ -915,7 +1213,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 
 		int islandNumber = CreateIsland.getIslandNumber(l);
-		IslandInfo ii = Settings.islands.get(islandNumber);
+		IslandInfo ii = settings.getIslandInfo(islandNumber);
 		if (ii == null) {
 			return false;
 		}

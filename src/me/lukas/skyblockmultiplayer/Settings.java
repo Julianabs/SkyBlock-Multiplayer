@@ -1,8 +1,6 @@
 package me.lukas.skyblockmultiplayer;
 
 import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.inventory.ItemStack;
 
 public class Settings {
@@ -30,6 +28,14 @@ public class Settings {
 	// pvp
 	private int pvp_livesPerIsland; // lives points for every island
 	private int pvp_islandsPerPlayer; // amount of islands who every player can have
+
+	private HashMap<StringBuilder, PlayerInfo> players;
+	private HashMap<Integer, IslandInfo> islands;
+
+	public Settings() {
+		this.players = new HashMap<StringBuilder, PlayerInfo>(); // Key = player name, value PlayerInfo
+		this.islands = new HashMap<Integer, IslandInfo>();
+	}
 
 	public void setItemsChest(ItemStack[] items) {
 		this.itemsChest = items;
@@ -193,18 +199,36 @@ public class Settings {
 		return this.pvp_islandsPerPlayer;
 	}
 
-	public static PlayerInfo getPlayerInfo(String playerName) {
+	public PlayerInfo getPlayerInfo(String playerName) {
 		return players.get(new StringBuilder(playerName));
 	}
-	
-	public static PlayerInfo getPlayerInfo(StringBuilder playerName) {
-		return players.get(playerName);
+
+	public void addPlayer(String playerName, PlayerInfo pi) {
+		this.players.put(new StringBuilder(playerName), pi);
 	}
-	
+
+	public void removePlayer(String playerName) {
+		this.players.remove(new StringBuilder(playerName));
+	}
+
+	public HashMap<StringBuilder, PlayerInfo> getPlayerInfos() {
+		return this.players;
+	}
+
+	public void resetPlayerInfos() {
+		this.players.clear();
+	}
+
+	public IslandInfo getIslandInfo(int islandNumber) {
+		return this.islands.get(islandNumber);
+	}
+
+	public void addIslandInfo(IslandInfo ii) {
+		this.islands.put(ii.getIslandNumber(), ii);
+	}
 
 	/* Needed for plugin */
-	public static Map<StringBuilder, PlayerInfo> players = new HashMap<StringBuilder, PlayerInfo>(); // Key = player name, value PlayerInfo
-	public static Map<Integer, IslandInfo> islands = new HashMap<Integer, IslandInfo>();
 
 	public static int numbersPlayers; // Amount of players in SkyBlock
+
 }

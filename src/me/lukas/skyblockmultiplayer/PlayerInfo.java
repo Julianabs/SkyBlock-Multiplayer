@@ -1,14 +1,13 @@
 package me.lukas.skyblockmultiplayer;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 public class PlayerInfo {
 
@@ -45,37 +44,22 @@ public class PlayerInfo {
 
 	public PlayerInfo(String playerName) {
 
-		// checke, ob playerfile existiert, ansonsten neu erstellen
-
 		this.playerName = new StringBuilder(playerName);
-		try {
-			this.loadPlayerInfo();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
-		if (this.islandInfo == null) {
-
-		}
-
-		/*
-		this.hasIsland = false;
 		this.isDead = false;
 
-		this.livesLeft = Settings.pvp_livesPerIsland;
-		this.islandsLeft = Settings.pvp_islandsPerPlayer;
+		this.livesLeft = SkyBlockMultiplayer.settings.getLivesPerIsland();
+		this.islandsLeft = SkyBlockMultiplayer.settings.getIslandsPerPlayer();
+		
+		this.buildPermissions = new HashMap<Integer, IslandInfo>();
 
-		this.islandLocation = null;
-		this.homeLocation = null;
 		this.oldLocation = null;
 
-		this.islandInventory = new ArrayList<String>();
-		this.islandArmor = new ArrayList<String>();
+		this.islandInventory = new ItemStack[36];
+		this.islandArmor = new ItemStack[36];
 
-		this.oldInventory = new ArrayList<String>();
-		this.oldArmor = new ArrayList<String>();
-
-		this.friends = new ArrayList<String>();
+		this.oldInventory = new ItemStack[36];
+		this.oldArmor = new ItemStack[36];
 
 		this.islandFood = 0;
 		this.oldFood = 0;
@@ -87,7 +71,7 @@ public class PlayerInfo {
 		this.oldExp = 0;
 
 		this.islandLevel = 0;
-		this.oldLevel = 0;*/
+		this.oldLevel = 0;
 
 	}
 
@@ -105,6 +89,10 @@ public class PlayerInfo {
 
 	public boolean getHasIsland() {
 		return this.islandInfo != null;
+	}
+
+	public IslandInfo getIslandInfo() {
+		return this.islandInfo;
 	}
 
 	public void setDead(boolean b) {
@@ -150,12 +138,16 @@ public class PlayerInfo {
 	}
 
 	public Location getHomeLocation() {
-		if (this.islandInfo == null)
+		if (this.islandInfo == null) {
 			return null;
+		}
 		return this.islandInfo.getHomeLocation();
 	}
 
 	public void setOldLocation(Location l) {
+		if (l == null) {
+			return;
+		}
 		if (!l.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName())) {
 			this.oldLocation = l;
 		}
@@ -205,11 +197,6 @@ public class PlayerInfo {
 		return this.oldArmor;
 	}
 
-	/**
-	 * TODO: Change friend methods 
-	 * @param s
-	 */
-
 	public void addFriend(StringBuilder playerName) {
 		this.islandInfo.addFriend(playerName);
 	}
@@ -220,23 +207,28 @@ public class PlayerInfo {
 
 	public boolean canBuildOnIslandNr(int islandnr) {
 		// Check own island
-		if (islandnr == this.islandInfo.getIslandNr()){
+		if (islandnr == this.islandInfo.getIslandNumber()) {
 			return true;
 		}
 		// check island list
 		IslandInfo built = this.buildPermissions.get(islandnr);
 		if (built == null)
 			return false;
-		if (built.containsFriend(this.playerName)){
+
+		if (built.containsFriend(this.playerName)) {
 			return true;
 		}
 		return false;
 	}
-	
-	public IslandInfo getIslandInfoFromFriend(String playername) {
+
+	public void addBuildPermission(int islandNumber, IslandInfo ii) {
+		this.buildPermissions.put(islandNumber, ii);
+	}
+
+	public IslandInfo getIslandInfoFromFriend(String playerName) {
 		// check own islandlist for name
-		for (IslandInfo islandinfo : this.buildPermissions.values()){
-			if (islandinfo.isIslandOwner(playername) && islandinfo.containsFriend(this.playerName)){
+		for (IslandInfo islandinfo : this.buildPermissions.values()) {
+			if (islandinfo.isIslandOwner(playerName) && islandinfo.containsFriend(this.playerName)) {
 				return islandinfo;
 			}
 		}
@@ -318,12 +310,20 @@ public class PlayerInfo {
 	public void setIslandInfo(IslandInfo ii) {
 		this.islandInfo = ii;
 	}
-	
-	public HashMap<Integer,IslandInfo> getBuiltPermissionList(){
+
+	public HashMap<Integer, IslandInfo> getBuiltPermissionList() {
 		return this.buildPermissions;
 	}
+	
+	public ArrayList<Integer> getBuildListNumbers() {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for (Integer number : this.buildPermissions.keySet()) {
+			list.add(number);
+		}
+		return list;
+	}
 
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	private void loadPlayerInfo() throws Exception {
 		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
 		File filePlayerData = new File("players", this.playerName + ".yml");
@@ -358,8 +358,7 @@ public class PlayerInfo {
 				this.buildPermissions.put(islandnr, friend);
 			}
 		}
-		
-		
+
 		boolean isOnIsland = false;
 		if (yamlPlayerInfo.contains(EnumPlayerInfo.IS_ON_ISLAND.getPath())) {
 			isOnIsland = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerInfo.IS_ON_ISLAND.getPath()).toString());
@@ -511,7 +510,7 @@ public class PlayerInfo {
 		/*yamlPlayerData.load(filePlayerData);
 		for (String friend : yamlPlayerData.getConfigurationSection("friends").getKeys(false)) {
 			
-		}*/
+		}
 
 		yamlPlayerInfo.save(filePlayerData);
 	}
@@ -524,7 +523,6 @@ public class PlayerInfo {
 		yamlPlayerData.set(EnumPlayerInfo.IS_ON_ISLAND.getPath(), this.isOnIsland);
 		yamlPlayerData.set(EnumPlayerInfo.IS_DEAD.getPath(), this.isDead);
 
-		/** Do-TO **/
 		// yamlPlayerData.set(EnumPlayerConfig.FRIENDS.getPath(), ); 
 		yamlPlayerData.set(EnumPlayerInfo.ISLAND_FOOD.getPath(), "" + this.islandFood);
 		yamlPlayerData.set(EnumPlayerInfo.ISLAND_HEALTH.getPath(), "" + this.islandHealth);
@@ -545,5 +543,5 @@ public class PlayerInfo {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 }
