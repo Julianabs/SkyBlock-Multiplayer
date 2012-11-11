@@ -171,13 +171,13 @@ public class SkyBlockCommand implements CommandExecutor {
 
 			Player player = (Player) sender;
 
-			if (args[0].equalsIgnoreCase("setowner")) {
+			/*if (args[0].equalsIgnoreCase("setowner")) { // TODO
 				if (args.length < 2) {
 					player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
 					return true;
 				}
 				return this.setOwner(player, args[1], args[2]);
-			}
+			}*/
 
 			if (args[0].equalsIgnoreCase("tower")) {
 				return this.toTower(player);
@@ -357,7 +357,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			Bukkit.getServer().unloadWorld(SkyBlockMultiplayer.settings.getWorldName(), true);
 			SkyBlockMultiplayer.skyBlockWorld = null;
 			SkyBlockMultiplayer.settings.setIsOnline(false);
-			SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, ConfigPlugin.OPTIONS_SKYBLOCKONLINE.path, false);
+			SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, EnumPluginConfig.OPTIONS_SKYBLOCKONLINE.getPath(), false);
 			sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_IS_NOW_OFFLINE.getSentence());
 			return true;
 
@@ -379,7 +379,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		SkyBlockMultiplayer.skyBlockWorld = null;
 		SkyBlockMultiplayer.getSkyBlockWorld();
 		SkyBlockMultiplayer.settings.setIsOnline(true);
-		SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, ConfigPlugin.OPTIONS_SKYBLOCKONLINE.path, true);
+		SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, EnumPluginConfig.OPTIONS_SKYBLOCKONLINE.getPath(), true);
 		sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_IS_NOW_ONLINE.getSentence());
 		return true;
 	}
@@ -443,7 +443,7 @@ public class SkyBlockCommand implements CommandExecutor {
 					}
 					SkyBlockMultiplayer.getInstance().loadLanguageConfig();
 					SkyBlockMultiplayer.settings.setLanguage(s);
-					SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, ConfigPlugin.OPTIONS_LANGUAGE.path, s);
+					SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, EnumPluginConfig.OPTIONS_LANGUAGE.getPath(), s);
 					sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_LANGUAGE_CHANGED.getSentence());
 					return true;
 				} catch (Exception e) {
@@ -472,13 +472,13 @@ public class SkyBlockCommand implements CommandExecutor {
 	private boolean setGameMode(CommandSender sender, String s) {
 		if (s.equalsIgnoreCase("build")) {
 			SkyBlockMultiplayer.settings.setGameMode(GameMode.BUILD);
-			SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, ConfigPlugin.OPTIONS_GAMEMODE.path, "build");
+			SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, EnumPluginConfig.OPTIONS_GAMEMODE.getPath(), "build");
 			sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_GAMEMODE_CHANGED.getSentence());
 			return true;
 		}
 		if (s.equalsIgnoreCase("pvp")) {
 			SkyBlockMultiplayer.settings.setGameMode(GameMode.PVP);
-			SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, ConfigPlugin.OPTIONS_GAMEMODE.path, "pvp");
+			SkyBlockMultiplayer.getInstance().setStringbyPath(SkyBlockMultiplayer.getInstance().configPlugin, SkyBlockMultiplayer.getInstance().filePlugin, EnumPluginConfig.OPTIONS_GAMEMODE.getPath(), "pvp");
 			sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_GAMEMODE_CHANGED.getSentence());
 			return true;
 		}
@@ -642,9 +642,9 @@ public class SkyBlockCommand implements CommandExecutor {
 			return true;
 		}
 
-		if (!Permissions.SKYBLOCK_JOIN.has(player)) {
+		/*if (!Permissions.SKYBLOCK_JOIN.has(player)) {
 			return this.notAuthorized(player);
-		}
+		}*/
 
 		if (SkyBlockMultiplayer.settings.getIsLocked()) {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_IS_CLOSED.getSentence());
@@ -724,7 +724,7 @@ public class SkyBlockCommand implements CommandExecutor {
 
 				// teleport player
 				SkyBlockMultiplayer.getInstance().removeCreatures(pi.getIslandLocation());
-				player.teleport(SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pi));
+				player.teleport(SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pi.getIslandInfo()));
 				pi.setIsOnIsland(true);
 
 				Settings.numbersPlayers++;
@@ -782,7 +782,7 @@ public class SkyBlockCommand implements CommandExecutor {
 				SkyBlockMultiplayer.getInstance().removeCreatures(pi.getIslandLocation());
 				player.teleport(pi.getIslandLocation());
 			} else {
-				Location homeSweetHome = SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pi);
+				Location homeSweetHome = SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pi.getIslandInfo());
 				if (homeSweetHome == null) { // if null, island is missing and home location returns no safe block
 					player.sendMessage(SkyBlockMultiplayer.getInstance().pName + "Cannot teleport to your home location, your island is probably missing.");
 					return true;
@@ -1056,7 +1056,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		if (target.trim().equalsIgnoreCase("")) {
 			pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
 		} else {
-			res = SkyBlockMultiplayer.getInstance().getFullPlayerName(target);
+			res = SkyBlockMultiplayer.getInstance().getFullPlayerName(pi, target);
 			if (res.equalsIgnoreCase("-1")) {
 				player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_PLAYER_NAME.getSentence());
 				return true;
@@ -1097,7 +1097,7 @@ public class SkyBlockCommand implements CommandExecutor {
 	 * @param newOwner the new player who gets this island
 	 * @return
 	 */
-	private boolean setOwner(Player player, String number, String newOwner) {
+	/*private boolean setOwner(Player player, String number, String newOwner) {
 		if (!Permissions.SKYBLOCK_OWNER_SET.has(player)) {
 			return this.notAuthorized(player);
 		}
@@ -1114,7 +1114,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			return true;
 		}
 
-		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(newOwner);
+		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(pi, newOwner);
 		if (res.equalsIgnoreCase("-1")) {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_PLAYER_NAME.getSentence());
 			return true;
@@ -1144,7 +1144,7 @@ public class SkyBlockCommand implements CommandExecutor {
 		SkyBlockMultiplayer.settings.addPlayer(res, pi);
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_CHANGED_OWNER_TO.getSentence() + res);
 		return true;
-	}
+	}*/
 
 	/**
 	 * Teleport to tower.
@@ -1335,7 +1335,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			player.teleport(pi.getIslandLocation());
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WELCOME_BACK.getSentence() + player.getName());
 		} else {
-			Location homeSweetHome = SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pi);
+			Location homeSweetHome = SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pi.getIslandInfo());
 			if (homeSweetHome == null) { // if null, island is missing and / or home location returns no safe block
 				player.sendMessage(SkyBlockMultiplayer.getInstance().pName + "Cannot teleport to your home location, your island is probably missing.");
 				return true;
@@ -1392,14 +1392,22 @@ public class SkyBlockCommand implements CommandExecutor {
 
 		String list = "";
 		boolean first = true;
-		for (IslandInfo islandinfo : pi.getBuiltPermissionList().values()) {
+		for (String friend : pi.getIslandInfo().getFriends()) {
+			if (first) {
+				first = false;
+			} else {
+				list += ", ";
+			}
+			list += friend;
+		}
+		/*for (IslandInfo islandinfo : pi.getBuiltPermissionList().values()) {
 			if (first) {
 				first = false;
 			} else {
 				list += ", ";
 			}
 			list += islandinfo.getIslandOwner();
-		}
+		}*/
 		player.sendMessage(list);
 		return true;
 	}
@@ -1421,7 +1429,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			return true;
 		}
 
-		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(toPlayer);
+		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(pi, toPlayer);
 		if (res.equalsIgnoreCase("-1")) {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_PLAYER_NAME.getSentence());
 			return true;
@@ -1476,7 +1484,8 @@ public class SkyBlockCommand implements CommandExecutor {
 			}
 		}
 
-		Location homeSweetHome = SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pi);
+		// TODO
+		Location homeSweetHome = SkyBlockMultiplayer.getInstance().getSafeHomeLocation(pTarget);
 		if (homeSweetHome == null) { // if null, island is missing and home location returns no safe block
 			player.sendMessage("Cannot teleport to the friend home location, his island is probably missing.");
 			return true;
@@ -1494,7 +1503,13 @@ public class SkyBlockCommand implements CommandExecutor {
 	 * @return
 	 */
 	private boolean homeAdd(Player player, String playerToAdd) {
-		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(playerToAdd);
+		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (pi == null) {
+			player.sendMessage("You have no island");
+			return true;
+		}
+		
+		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(pi, playerToAdd);
 		if (res.equalsIgnoreCase("-1")) {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_PLAYER_NAME.getSentence());
 			return true;
@@ -1505,12 +1520,6 @@ public class SkyBlockCommand implements CommandExecutor {
 		}
 
 		if (res.equalsIgnoreCase(player.getName())) {
-			return true;
-		}
-		
-		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
-		if (pi == null) {
-			player.sendMessage("You have no island");
 			return true;
 		}
 
@@ -1524,8 +1533,10 @@ public class SkyBlockCommand implements CommandExecutor {
 			piFriend = new PlayerInfo(res);
 		}
 
-		pi.addFriend(newFriend.getName());
-		
+		pi.addFriend(res);
+		piFriend.addBuildPermission(pi.getIslandInfo().getIslandNumber(), pi.getIslandInfo());
+		SkyBlockMultiplayer.getInstance().savePlayerInfo(piFriend);
+
 		SkyBlockMultiplayer.getInstance().saveIslandInfo(pi.getIslandInfo());
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_FRIEND_ADDED.getSentence());
 		return true;
@@ -1539,7 +1550,12 @@ public class SkyBlockCommand implements CommandExecutor {
 	 * @return
 	 */
 	private boolean homeRemove(Player player, String playerToRemove) {
-		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(playerToRemove);
+		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (pi == null) {
+			return true;
+		}		
+		
+		String res = SkyBlockMultiplayer.getInstance().getFullPlayerName(pi, playerToRemove);
 		if (res.equalsIgnoreCase("-1")) {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_PLAYER_NAME.getSentence());
 			return true;
@@ -1548,18 +1564,13 @@ public class SkyBlockCommand implements CommandExecutor {
 			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_BETTER_SPECIFY.getSentence());
 			return true;
 		}
-		
+
 		if (res.equalsIgnoreCase(player.getName())) {
 			return true;
 		}
 
-		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
-		if (pi == null) {
-			return true;
-		}
-		
 		pi.removeFriend(res);
-		
+
 		SkyBlockMultiplayer.getInstance().saveIslandInfo(pi.getIslandInfo());
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_FRIEND_REMOVED.getSentence());
 		return true;

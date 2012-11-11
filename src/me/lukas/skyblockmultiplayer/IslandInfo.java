@@ -32,9 +32,9 @@ public class IslandInfo {
 	public void addFriend(String friend) {
 		this.friends.add(friend);
 	}
-	
+
 	public void setFriends(ArrayList<String> friends) {
-		this.friends = friends;	
+		this.friends = friends;
 	}
 
 	public void removeFriend(String friend) {

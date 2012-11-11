@@ -29,11 +29,11 @@ public class Settings {
 	private int pvp_livesPerIsland; // lives points for every island
 	private int pvp_islandsPerPlayer; // amount of islands who every player can have
 
-	private HashMap<StringBuilder, PlayerInfo> players;
+	private HashMap<String, PlayerInfo> players;
 	private HashMap<Integer, IslandInfo> islands;
 
 	public Settings() {
-		this.players = new HashMap<StringBuilder, PlayerInfo>(); // Key = player name, value PlayerInfo
+		this.players = new HashMap<String, PlayerInfo>(); // Key = player name, value PlayerInfo
 		this.islands = new HashMap<Integer, IslandInfo>();
 	}
 
@@ -200,7 +200,7 @@ public class Settings {
 	}
 
 	public PlayerInfo getPlayerInfo(String playerName) {
-		PlayerInfo pi = players.get(new StringBuilder(playerName));
+		PlayerInfo pi = players.get(playerName);
 		if (pi == null) {
 			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(playerName);
 			if (pi != null) {
@@ -211,14 +211,14 @@ public class Settings {
 	}
 
 	public void addPlayer(String playerName, PlayerInfo pi) {
-		this.players.put(new StringBuilder(playerName), pi);
+		this.players.put(playerName, pi);
 	}
 
 	public void removePlayer(String playerName) {
-		this.players.remove(new StringBuilder(playerName));
+		this.players.remove(playerName);
 	}
 
-	public HashMap<StringBuilder, PlayerInfo> getPlayerInfos() {
+	public HashMap<String, PlayerInfo> getPlayerInfos() {
 		return this.players;
 	}
 

@@ -47,7 +47,7 @@ public class PlayerUseBucketListener implements Listener {
 				return;
 			}
 
-			if (SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation())) {
+			if (pi.havePermissionThere(b.getLocation())) {
 				return;
 			}
 			event.setCancelled(true);

@@ -48,7 +48,7 @@ public class PlayerTeleport implements Listener {
 				return;
 			}
 			if (SkyBlockMultiplayer.settings.getWithProtectedArea()) {
-				if (SkyBlockMultiplayer.checkBuildPermission(pi, event.getTo())) {
+				if (pi.havePermissionThere(event.getTo())) {
 					return;
 				}
 				event.setCancelled(true);

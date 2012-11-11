@@ -32,7 +32,7 @@ public class EntityDeath implements Listener {
 			return;
 		}
 
-		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player)) {
+		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && !pi.getIsOnIsland()) {
 			pi.setOldInventory(player.getInventory().getContents());
 			pi.setOldArmor(player.getInventory().getArmorContents());
 			pi.setOldExp(player.getExp());

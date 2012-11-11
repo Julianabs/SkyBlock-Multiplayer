@@ -28,8 +28,6 @@ public class PlayerBreackBlockListener implements Listener {
 		if (Permissions.SKYBLOCK_BUILD.has(player)) {
 			return;
 		}
-		
-		System.out.println("called perm");
 
 		if (b.getLocation().getBlockX() >= -20 && b.getLocation().getBlockX() <= 20) {
 			if (b.getLocation().getBlockZ() >= -20 && b.getLocation().getBlockZ() <= 20) {
@@ -48,7 +46,7 @@ public class PlayerBreackBlockListener implements Listener {
 				return;
 			}
 
-			if (SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation())) {
+			if (pi.havePermissionThere(b.getLocation())) {
 				return;
 			}
 			event.setCancelled(true);

@@ -29,8 +29,8 @@ import org.jnbt.StringTag;
 import org.jnbt.Tag;
 
 public class CreateIsland {
-	
-	private static void createIslandAtLocation(Location l){
+
+	private static void createIslandAtLocation(Location l) {
 		try {
 			File f = new File(SkyBlockMultiplayer.getInstance().getDataFolder(), SkyBlockMultiplayer.settings.getIslandSchematic());
 			if (f.exists() && f.isFile()) {
@@ -52,8 +52,8 @@ public class CreateIsland {
 			CreateIsland.createDefaultIsland(l);
 		}
 	}
-	
-	public static IslandInfo createIslandWithNr(int nr){
+
+	public static IslandInfo createIslandWithNr(int nr) {
 		// Calculate Location from number
 		Location l = CreateIsland.getIslandPosition(nr);
 		CreateIsland.createIslandAtLocation(l);
@@ -61,8 +61,8 @@ public class CreateIsland {
 		SkyBlockMultiplayer.settings.addIslandInfo(islandInfo);
 		return islandInfo;
 	}
-	
-	public static IslandInfo createNextIsland(){
+
+	public static IslandInfo createNextIsland() {
 		int numberIslands = 1;
 		Location l = CreateIsland.getIslandPosition(numberIslands);
 
@@ -76,7 +76,7 @@ public class CreateIsland {
 		SkyBlockMultiplayer.settings.addIslandInfo(islandInfo);
 		return islandInfo;
 	}
-	
+
 	//public Location Islandlocation;
 
 	/*public CreateIsland(Player player) {
@@ -147,11 +147,25 @@ public class CreateIsland {
 	public static int getIslandNumber(Location l) {
 		int px = l.getBlockX();
 		int pz = l.getBlockZ();
-		
+
 		float distance = SkyBlockMultiplayer.settings.getIslandDistance();
 
+		// tower
 		if (px >= -(distance / 2.0) && px <= (distance / 2.0)) {
 			if (pz >= -(distance / 2.0) && pz <= (distance / 2.0)) {
+				return 0;
+			}
+		}
+
+		if (SkyBlockMultiplayer.settings.getWithProtectedBorder()) {
+			//check if border
+			int borderLength = 3+1;
+			int xDistanceToBorder = Math.abs((px - (int) (distance / 2.0)) % (int) distance);
+			if (xDistanceToBorder < borderLength || xDistanceToBorder > distance - borderLength) {
+				return 0;
+			}		
+			int zDistanceToBorder = Math.abs((pz - (int) (distance / 2.0)) % (int) distance);
+			if (zDistanceToBorder < borderLength || zDistanceToBorder > distance - borderLength) {
 				return 0;
 			}
 		}

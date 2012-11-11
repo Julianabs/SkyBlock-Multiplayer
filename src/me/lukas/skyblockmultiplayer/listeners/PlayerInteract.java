@@ -42,9 +42,10 @@ public class PlayerInteract implements Listener {
 
 		boolean hasBuildPermission = false;
 		if (b == null) {
-			hasBuildPermission = SkyBlockMultiplayer.checkBuildPermission(pi, player.getLocation());
+			// hasBuildPermission = SkyBlockMultiplayer.checkBuildPermission(pi, player.getLocation());
+			hasBuildPermission = pi.havePermissionThere(player.getLocation());
 		} else {
-			hasBuildPermission = SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation());
+			hasBuildPermission = pi.havePermissionThere(player.getLocation());
 		}
 
 		if (item != null) {
@@ -68,23 +69,22 @@ public class PlayerInteract implements Listener {
 			if (item.getType() == Material.STICK) {
 				if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
 					String owner = "";
+					int islandNumber = -1;
+					
 					if (b == null) {
 						owner = SkyBlockMultiplayer.getOwner(player.getLocation());
 					} else {
 						owner = SkyBlockMultiplayer.getOwner(b.getLocation());
 					}
-					
-					System.out.println("called");
 
 					if (owner.equals("")) {
-						int i = -1;
 						if (b == null) {
-							i = CreateIsland.getIslandNumber(player.getLocation());
+							islandNumber = CreateIsland.getIslandNumber(player.getLocation());
 						} else {
-							i = CreateIsland.getIslandNumber(b.getLocation());
+							islandNumber = CreateIsland.getIslandNumber(b.getLocation());
 						}
 
-						if (i == 0) {
+						if (islandNumber == 0) {
 							if (SkyBlockMultiplayer.getInstance().locationIsOnTower(player.getLocation())) {
 								player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_AREA_OF_SPAWN_TOWER.getSentence());
 								event.setCancelled(true);
@@ -95,31 +95,31 @@ public class PlayerInteract implements Listener {
 							event.setCancelled(true);
 							return;
 						}
-						player.sendMessage("Island number: " + i);
+						player.sendMessage("Island number: " + islandNumber);
 						event.setCancelled(true);
 						return;
 					} else {
-						int i = -1;
 						if (b == null) {
-							i = CreateIsland.getIslandNumber(player.getLocation());
+							islandNumber = CreateIsland.getIslandNumber(player.getLocation());
 						} else {
-							i = CreateIsland.getIslandNumber(b.getLocation());
+							islandNumber = CreateIsland.getIslandNumber(b.getLocation());
 						}
 
-						if (i == -1) {
+						if (islandNumber == -1) {
 							player.sendMessage(Language.MSGS_AREA_BORDERS.getSentence());
 							event.setCancelled(true);
 							return;
 						}
-						player.sendMessage("Island number: " + i);
+						player.sendMessage("Island number: " + islandNumber);
 					}
-
+					
 					player.sendMessage("Owner: " + owner);
 
-					// get friends			
-					IslandInfo ii = pi.getIslandInfo();
+					// get friends
+					IslandInfo ii = SkyBlockMultiplayer.settings.getIslandInfo(islandNumber);
 
 					if (ii == null) {
+						player.sendMessage("called");
 						return;
 					}
 
@@ -165,11 +165,11 @@ public class PlayerInteract implements Listener {
 			}
 
 			if (b == null) {
-				if (SkyBlockMultiplayer.checkBuildPermission(pi, player.getLocation())) {
+				if (pi.havePermissionThere(player.getLocation())) {
 					return;
 				}
 			} else {
-				if (SkyBlockMultiplayer.checkBuildPermission(pi, b.getLocation())) {
+				if (pi.havePermissionThere(b.getLocation())) {
 					return;
 				}
 			}

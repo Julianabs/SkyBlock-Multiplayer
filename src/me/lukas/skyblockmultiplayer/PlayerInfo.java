@@ -48,7 +48,7 @@ public class PlayerInfo {
 
 		this.livesLeft = SkyBlockMultiplayer.settings.getLivesPerIsland();
 		this.islandsLeft = SkyBlockMultiplayer.settings.getIslandsPerPlayer();
-		
+
 		this.buildPermissions = new HashMap<Integer, IslandInfo>();
 
 		this.oldLocation = null;
@@ -203,15 +203,24 @@ public class PlayerInfo {
 		this.islandInfo.removeFriend(s);
 	}
 
-	public boolean canBuildOnIslandNr(int islandnr) {
+	public boolean havePermissionThere(Location l) {
+		int islandNumber = CreateIsland.getIslandNumber(l);
+		if (islandNumber == 0) {
+			return false;
+		}
+		return this.havePermissionThere(islandNumber);
+	}
+
+	public boolean havePermissionThere(int islandnr) {
 		// Check own island
 		if (islandnr == this.islandInfo.getIslandNumber()) {
 			return true;
 		}
 		// check island list
 		IslandInfo built = this.buildPermissions.get(islandnr);
-		if (built == null)
+		if (built == null) {
 			return false;
+		}
 
 		if (built.containsFriend(this.playerName)) {
 			return true;
@@ -312,7 +321,7 @@ public class PlayerInfo {
 	public HashMap<Integer, IslandInfo> getBuiltPermissionList() {
 		return this.buildPermissions;
 	}
-	
+
 	public ArrayList<Integer> getBuildListNumbers() {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		for (Integer number : this.buildPermissions.keySet()) {
