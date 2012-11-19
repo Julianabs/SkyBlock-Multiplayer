@@ -11,14 +11,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 
-public class PlayerUseBucketListener implements Listener {
+public class PlayerUseBucket implements Listener {
 
 	@EventHandler
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
 		Player player = event.getPlayer();
 		Block b = event.getBlockClicked();
 
-		if (!SkyBlockMultiplayer.settings.getIsOnline()) {
+		if (!SkyBlockMultiplayer.getInstance().getSettings().getIsOnline()) {
 			return;
 		}
 
@@ -37,12 +37,12 @@ public class PlayerUseBucketListener implements Listener {
 			}
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.settings.getWithProtectedArea()) {
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.getInstance().getSettings().getWithProtectedArea()) {
 			return;
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
-			PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
+			PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 			if (pi == null) { // Check, if player is in playerlist
 				return;
 			}

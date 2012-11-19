@@ -26,7 +26,7 @@ public class PlayerInteract implements Listener {
 		Block b = event.getClickedBlock();
 		ItemStack item = event.getItem();
 
-		if (!SkyBlockMultiplayer.settings.getIsOnline()) {
+		if (!SkyBlockMultiplayer.getInstance().getSettings().getIsOnline()) {
 			return;
 		}
 
@@ -34,7 +34,7 @@ public class PlayerInteract implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
 			event.setCancelled(true);
 			return;
@@ -49,10 +49,10 @@ public class PlayerInteract implements Listener {
 		}
 
 		if (item != null) {
-			if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
+			if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
 				if (item.getType() == Material.ENDER_PEARL) {
 					if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
-						if (SkyBlockMultiplayer.settings.getAllowEnderPearl()) {
+						if (SkyBlockMultiplayer.getInstance().getSettings().getAllowEnderPearl()) {
 							if (hasBuildPermission) {
 								return;
 							}
@@ -72,9 +72,9 @@ public class PlayerInteract implements Listener {
 					int islandNumber = -1;
 					
 					if (b == null) {
-						owner = SkyBlockMultiplayer.getOwner(player.getLocation());
+						owner = SkyBlockMultiplayer.getInstance().getOwner(player.getLocation());
 					} else {
-						owner = SkyBlockMultiplayer.getOwner(b.getLocation());
+						owner = SkyBlockMultiplayer.getInstance().getOwner(b.getLocation());
 					}
 
 					if (owner.equals("")) {
@@ -116,7 +116,7 @@ public class PlayerInteract implements Listener {
 					player.sendMessage("Owner: " + owner);
 
 					// get friends
-					IslandInfo ii = SkyBlockMultiplayer.settings.getIslandInfo(islandNumber);
+					IslandInfo ii = SkyBlockMultiplayer.getInstance().getSettings().getIslandInfo(islandNumber);
 
 					if (ii == null) {
 						player.sendMessage("called");
@@ -155,7 +155,7 @@ public class PlayerInteract implements Listener {
 			return;
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.settings.getWithProtectedArea()) {
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.getInstance().getSettings().getWithProtectedArea()) {
 			return;
 		}
 

@@ -10,14 +10,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class PlayerBreackBlockListener implements Listener {
+public class PlayerBreackBlock implements Listener {
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		Player player = event.getPlayer();
 		Block b = event.getBlock();
 
-		if (!SkyBlockMultiplayer.settings.getIsOnline()) {
+		if (!SkyBlockMultiplayer.getInstance().getSettings().getIsOnline()) {
 			return;
 		}
 
@@ -36,12 +36,12 @@ public class PlayerBreackBlockListener implements Listener {
 			}
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.settings.getWithProtectedArea()) {
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.getInstance().getSettings().getWithProtectedArea()) {
 			return;
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
-			PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
+			PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 			if (pi == null) { // Check, if player is in playerlist
 				return;
 			}
@@ -51,23 +51,6 @@ public class PlayerBreackBlockListener implements Listener {
 			}
 			event.setCancelled(true);
 			return;
-
-			/*PlayerInfo owner = SkyBlockMultiplayer.getOwner(b.getLocation());
-			if (owner == null) {
-				if (SkyBlockMultiplayer.canPlayerDoThat(pi, b.getLocation())) {
-					return;
-				}
-				event.setCancelled(true);
-				return;
-			}
-
-			if (owner.getPlayerName().equalsIgnoreCase(player.getName())) {
-				return;
-			}
-
-			if (owner.getFriends().contains(player.getName())) {
-				return;
-			}*/
 		}
 	}
 }
