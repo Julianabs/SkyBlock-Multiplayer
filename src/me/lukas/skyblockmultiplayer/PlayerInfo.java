@@ -46,8 +46,8 @@ public class PlayerInfo {
 
 		this.isDead = false;
 
-		this.livesLeft = SkyBlockMultiplayer.settings.getLivesPerIsland();
-		this.islandsLeft = SkyBlockMultiplayer.settings.getIslandsPerPlayer();
+		this.livesLeft = SkyBlockMultiplayer.getInstance().getSettings().getLivesPerIsland();
+		this.islandsLeft = SkyBlockMultiplayer.getInstance().getSettings().getIslandsPerPlayer();
 
 		this.buildPermissions = new HashMap<Integer, IslandInfo>();
 
@@ -213,7 +213,7 @@ public class PlayerInfo {
 
 	public boolean havePermissionThere(int islandnr) {
 		// Check own island
-		if (islandnr == this.islandInfo.getIslandNumber()) {
+		if (this.islandInfo != null && islandnr == this.islandInfo.getIslandNumber()) {
 			return true;
 		}
 		// check island list

@@ -21,13 +21,13 @@ public class PlayerRespawn implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
 			event.setRespawnLocation(player.getWorld().getSpawnLocation());
 			return;
 		}
 
-		if ((SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && !pi.getIsOnIsland()) || SkyBlockMultiplayer.settings.getGameMode() == GameMode.PVP || pi.getIslandLocation() == null) {
+		if ((SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && !pi.getIsOnIsland()) || SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || pi.getIslandLocation() == null) {
 			player.getInventory().setContents(pi.getOldInventory());
 			player.getInventory().setArmorContents(pi.getOldArmor());
 			player.setExp(pi.getOldExp());
@@ -41,7 +41,7 @@ public class PlayerRespawn implements Listener {
 			return;
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD && SkyBlockMultiplayer.settings.getRespawnWithInventory()) {
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD && SkyBlockMultiplayer.getInstance().getSettings().getRespawnWithInventory()) {
 			if (!SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && pi.getIslandLocation() != null) {
 				player.getInventory().setContents(pi.getIslandInventory());
 				player.getInventory().setArmorContents(pi.getIslandArmor());
@@ -88,7 +88,7 @@ public class PlayerRespawn implements Listener {
 			}
 		}
 
-		if (SkyBlockMultiplayer.settings.getGameMode() == GameMode.BUILD) {
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
 			if (!SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && !pi.getIsOnIsland()) {
 				if (pi.getHomeLocation() == null) {
 					event.setRespawnLocation(pi.getIslandLocation());

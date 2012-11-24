@@ -32,7 +32,7 @@ public class CreateIsland {
 
 	private static void createIslandAtLocation(Location l) {
 		try {
-			File f = new File(SkyBlockMultiplayer.getInstance().getDataFolder(), SkyBlockMultiplayer.settings.getIslandSchematic());
+			File f = new File(SkyBlockMultiplayer.getInstance().getDataFolder(), SkyBlockMultiplayer.getInstance().getSettings().getIslandSchematic());
 			if (f.exists() && f.isFile()) {
 				Location islandLoc = new Location(l.getWorld(), l.getBlockX(), l.getBlockY() - 3, l.getBlockZ());
 				int res = CreateIsland.createStructure(islandLoc, f);
@@ -58,7 +58,7 @@ public class CreateIsland {
 		Location l = CreateIsland.getIslandPosition(nr);
 		CreateIsland.createIslandAtLocation(l);
 		IslandInfo islandInfo = new IslandInfo(nr);
-		SkyBlockMultiplayer.settings.addIslandInfo(islandInfo);
+		SkyBlockMultiplayer.getInstance().getSettings().addIslandInfo(islandInfo);
 		return islandInfo;
 	}
 
@@ -73,61 +73,22 @@ public class CreateIsland {
 		CreateIsland.createIslandAtLocation(l);
 		IslandInfo islandInfo = new IslandInfo(numberIslands);
 		islandInfo.setIslandLocation(l);
-		SkyBlockMultiplayer.settings.addIslandInfo(islandInfo);
+		SkyBlockMultiplayer.getInstance().getSettings().addIslandInfo(islandInfo);
 		return islandInfo;
 	}
 
-	//public Location Islandlocation;
-
-	/*public CreateIsland(Player player) {
-		int numberIslands = 1;
-		Location l = CreateIsland.getIslandPosition(numberIslands);
-
-		while (this.checkIfOccupied(l)) {
-			numberIslands++;
-			l = getIslandPosition(numberIslands);
-		}
-
-		player.sendMessage(Language.MSGS_SHOW_ISLAND_NUMBER.getSentence() + numberIslands);
-		this.createIsland(l);
-		this.Islandlocation = new Location(SkyBlockMultiplayer.getSkyBlockWorld(), l.getBlockX(), SkyBlockMultiplayer.getSkyBlockWorld().getHighestBlockAt(l.getBlockX(), l.getBlockZ()).getLocation().getBlockY(), l.getBlockZ());
-	}*/
-
-	/*public CreateIsland(int amount) {
+	public static void createIslands(int amount) {
 		int numberIslands = 1;
 		Location l = getIslandPosition(numberIslands);
 		for (int i = 0; i < amount; i++) {
-			while (this.checkIfOccupied(l)) {
+			while (checkIfOccupied(l)) {
 				numberIslands++;
 				l = getIslandPosition(numberIslands);
 				//System.out.println(numberIslands + " : Location " + SkyBlockMultiplayer.getStringLocation(l));
 			}
-			this.createIsland(l);
+			createIslandAtLocation(l);
 		}
-	}*/
-
-	/*public void createIsland(Location l) {
-		try {
-			File f = new File(SkyBlockMultiplayer.getDataFolder(), Settings.islandFileName);
-			if (f.exists() && f.isFile()) {
-				Location islandLoc = new Location(l.getWorld(), l.getBlockX(), l.getBlockY() - 3, l.getBlockZ());
-				int res = CreateIsland.createStructure(islandLoc, f);
-				if (res != 1) {
-					this.createDefaultIsland(l);
-					if (res == 0) {
-						SkyBlockMultiplayer.getLogger().warning("Island contains no bedrock.");
-					} else {
-						SkyBlockMultiplayer.getLogger().warning("Island contains too much bedrock.");
-					}
-				}
-			} else {
-				this.createDefaultIsland(l);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			this.createDefaultIsland(l);
-		}
-	}*/
+	}
 
 	public static int getAmountOfIslands() {
 		int amountIslands = 1;
@@ -148,7 +109,7 @@ public class CreateIsland {
 		int px = l.getBlockX();
 		int pz = l.getBlockZ();
 
-		float distance = SkyBlockMultiplayer.settings.getIslandDistance();
+		float distance = SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
 
 		// tower
 		if (px >= -(distance / 2.0) && px <= (distance / 2.0)) {
@@ -157,7 +118,7 @@ public class CreateIsland {
 			}
 		}
 
-		if (SkyBlockMultiplayer.settings.getWithProtectedBorder()) {
+		if (SkyBlockMultiplayer.getInstance().getSettings().getWithProtectedBorder()) {
 			//check if border
 			int borderLength = 3+1;
 			int xDistanceToBorder = Math.abs((px - (int) (distance / 2.0)) % (int) distance);
@@ -213,23 +174,23 @@ public class CreateIsland {
 		//System.out.println("Die Inseldistanz ist "+CreateNewIsland.IslandDistance);
 		// Berechne die Positionen
 		if (seite == 1) {
-			posX = (posSeite - r) * SkyBlockMultiplayer.settings.getIslandDistance();
-			posZ = -posSeite * SkyBlockMultiplayer.settings.getIslandDistance();
+			posX = (posSeite - r) * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
+			posZ = -posSeite * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
 		} else if (seite == 2) {
-			posX = posSeite * SkyBlockMultiplayer.settings.getIslandDistance();
-			posZ = (posSeite - r) * SkyBlockMultiplayer.settings.getIslandDistance();
+			posX = posSeite * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
+			posZ = (posSeite - r) * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
 		} else if (seite == 3) {
-			posX = (r - posSeite) * SkyBlockMultiplayer.settings.getIslandDistance();
-			posZ = posSeite * SkyBlockMultiplayer.settings.getIslandDistance();
+			posX = (r - posSeite) * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
+			posZ = posSeite * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
 		} else {
-			posX = -posSeite * SkyBlockMultiplayer.settings.getIslandDistance();
-			posZ = (r - posSeite) * SkyBlockMultiplayer.settings.getIslandDistance();
+			posX = -posSeite * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
+			posZ = (r - posSeite) * SkyBlockMultiplayer.getInstance().getSettings().getIslandDistance();
 		}
 		//System.out.println("Die Insel befindet sich auf "+posX+" in X-Richtung.");
 		//System.out.println("Die Insel befindet sich auf "+posZ+" in Z-Richtung.");
 
 		// create location for island
-		return new Location(SkyBlockMultiplayer.getSkyBlockWorld(), posX, SkyBlockMultiplayer.settings.getIslandYPosition(), posZ);
+		return new Location(SkyBlockMultiplayer.getSkyBlockWorld(), posX, SkyBlockMultiplayer.getInstance().getSettings().getIslandYPosition(), posZ);
 	}
 
 	private static void createDefaultIsland(Location l) {
@@ -240,21 +201,21 @@ public class CreateIsland {
 		// Ersetze Erde durch Sand
 		for (int x = 2; x <= 4; x++) {
 			for (int z = -1; z <= 1; z++) {
-				SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(x + l.getBlockX(), SkyBlockMultiplayer.settings.getIslandYPosition() - 2, z + l.getBlockZ()).setType(Material.SAND);
+				SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(x + l.getBlockX(), SkyBlockMultiplayer.getInstance().getSettings().getIslandYPosition() - 2, z + l.getBlockZ()).setType(Material.SAND);
 			}
 		}
 		//Erstelle oberste Grassebene
 		createLayer(l, 63, Material.GRASS);
 
 		// create Chest		
-		Block block = SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(0 + l.getBlockX(), SkyBlockMultiplayer.settings.getIslandYPosition(), 4 + l.getBlockZ());
+		Block block = SkyBlockMultiplayer.getSkyBlockWorld().getBlockAt(0 + l.getBlockX(), SkyBlockMultiplayer.getInstance().getSettings().getIslandYPosition(), 4 + l.getBlockZ());
 		block.setType(Material.CHEST);
 		Chest chest = (Chest) block.getState();
 		chest.getBlock().setData((byte) 2);
 
-		for (int i = 0; i < SkyBlockMultiplayer.settings.getItemsChest().length; i++) {
+		for (int i = 0; i < SkyBlockMultiplayer.getInstance().getSettings().getItemsChest().length; i++) {
 			try {
-				chest.getInventory().addItem(SkyBlockMultiplayer.settings.getItemsChest()[i]);
+				chest.getInventory().addItem(SkyBlockMultiplayer.getInstance().getSettings().getItemsChest()[i]);
 			} catch (Exception ex) {
 			}
 		}
@@ -293,7 +254,7 @@ public class CreateIsland {
 		return false;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes", "resource" })
 	public static int createStructure(Location loc, File path) throws Exception {
 		FileInputStream stream = new FileInputStream(path);
 		NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(stream));

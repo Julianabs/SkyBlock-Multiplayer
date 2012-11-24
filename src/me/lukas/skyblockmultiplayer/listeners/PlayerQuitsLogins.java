@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-public class Player_Quit_login implements Listener {
+public class PlayerQuitsLogins implements Listener {
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
@@ -19,12 +19,12 @@ public class Player_Quit_login implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
 			return;
 		}
 		
-		SkyBlockMultiplayer.settings.removePlayer(player.getName());
+		SkyBlockMultiplayer.getInstance().getSettings().removePlayer(player.getName());
 	}
 	
 	@EventHandler
@@ -35,7 +35,7 @@ public class Player_Quit_login implements Listener {
 			return;
 		}
 
-		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
 			return;
 		}

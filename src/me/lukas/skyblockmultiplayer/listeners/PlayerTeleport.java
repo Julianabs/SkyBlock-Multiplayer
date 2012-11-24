@@ -17,7 +17,7 @@ public class PlayerTeleport implements Listener {
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		Player player = event.getPlayer();
 
-		if (!SkyBlockMultiplayer.settings.getIsOnline()) {
+		if (!SkyBlockMultiplayer.getInstance().getSettings().getIsOnline()) {
 			return;
 		}
 
@@ -37,7 +37,7 @@ public class PlayerTeleport implements Listener {
 			}
 		}
 
-		PlayerInfo pi = SkyBlockMultiplayer.settings.getPlayerInfo(player.getName());
+		PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 		if (pi == null) { // Check, if player is in playerlist
 			return;
 		}
@@ -47,7 +47,7 @@ public class PlayerTeleport implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-			if (SkyBlockMultiplayer.settings.getWithProtectedArea()) {
+			if (SkyBlockMultiplayer.getInstance().getSettings().getWithProtectedArea()) {
 				if (pi.havePermissionThere(event.getTo())) {
 					return;
 				}
