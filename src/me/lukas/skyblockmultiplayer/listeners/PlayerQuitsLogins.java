@@ -15,7 +15,7 @@ public class PlayerQuitsLogins implements Listener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 
-		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getSkyBlockWorld().getName())) {
+		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) {
 			return;
 		}
 
@@ -31,7 +31,7 @@ public class PlayerQuitsLogins implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 
-		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getSkyBlockWorld().getName())) {
+		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) {
 			return;
 		}
 

@@ -146,7 +146,7 @@ public class PlayerInfo {
 		if (l == null) {
 			return;
 		}
-		if (!l.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName())) {
+		if (!l.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) {
 			this.oldLocation = l;
 		}
 	}

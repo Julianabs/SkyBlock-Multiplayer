@@ -17,7 +17,7 @@ public class PlayerRespawn implements Listener {
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
 
-		if (!player.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName())) {
+		if (!player.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) {
 			return;
 		}
 
@@ -27,7 +27,7 @@ public class PlayerRespawn implements Listener {
 			return;
 		}
 
-		if ((SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && !pi.getIsOnIsland()) || SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || pi.getIslandLocation() == null) {
+		if (!pi.getIsOnIsland() || SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || pi.getIslandLocation() == null) {
 			player.getInventory().setContents(pi.getOldInventory());
 			player.getInventory().setArmorContents(pi.getOldArmor());
 			player.setExp(pi.getOldExp());
@@ -42,7 +42,7 @@ public class PlayerRespawn implements Listener {
 		}
 
 		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD && SkyBlockMultiplayer.getInstance().getSettings().getRespawnWithInventory()) {
-			if (!SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && pi.getIslandLocation() != null) {
+			if (pi.getIsOnIsland() && pi.getIslandLocation() != null) {
 				player.getInventory().setContents(pi.getIslandInventory());
 				player.getInventory().setArmorContents(pi.getIslandArmor());
 				player.setExp(pi.getIslandExp());
@@ -57,7 +57,7 @@ public class PlayerRespawn implements Listener {
 				int py = pi.getIslandLocation().getBlockY() - 3;
 				int pz = pi.getIslandLocation().getBlockZ();
 
-				if (!new Location(player.getWorld(), px, py, pz).getBlock().getType().equals(Material.BEDROCK)) {
+				if (new Location(player.getWorld(), px, py, pz).getBlock().getType() != Material.BEDROCK) {
 					event.setRespawnLocation(player.getWorld().getSpawnLocation());
 
 					player.getInventory().setContents(pi.getOldInventory());
@@ -89,7 +89,7 @@ public class PlayerRespawn implements Listener {
 		}
 
 		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
-			if (!SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && !pi.getIsOnIsland()) {
+			if (pi.getIsOnIsland() && !pi.getIsOnIsland()) {
 				if (pi.getHomeLocation() == null) {
 					event.setRespawnLocation(pi.getIslandLocation());
 				} else {
