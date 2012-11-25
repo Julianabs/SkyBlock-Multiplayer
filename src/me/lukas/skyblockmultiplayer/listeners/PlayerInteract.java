@@ -30,7 +30,7 @@ public class PlayerInteract implements Listener {
 			return;
 		}
 
-		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getSkyBlockWorld().getName())) {
+		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) {
 			return;
 		}
 
@@ -38,22 +38,14 @@ public class PlayerInteract implements Listener {
 		if (pi == null) { // Check, if player is in playerlist
 			event.setCancelled(true);
 			return;
-		}
-
-		boolean hasBuildPermission = false;
-		if (b == null) {
-			// hasBuildPermission = SkyBlockMultiplayer.checkBuildPermission(pi, player.getLocation());
-			hasBuildPermission = pi.havePermissionThere(player.getLocation());
-		} else {
-			hasBuildPermission = pi.havePermissionThere(player.getLocation());
-		}
+		}		
 
 		if (item != null) {
 			if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
 				if (item.getType() == Material.ENDER_PEARL) {
 					if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
 						if (SkyBlockMultiplayer.getInstance().getSettings().getAllowEnderPearl()) {
-							if (hasBuildPermission) {
+							if (pi.havePermissionThere(player.getLocation())) {
 								return;
 							}
 
@@ -68,22 +60,17 @@ public class PlayerInteract implements Listener {
 
 			if (item.getType() == Material.STICK) {
 				if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
-					String owner = "";
-					int islandNumber = -1;
+					int islandNumber = 0;
 					
 					if (b == null) {
-						owner = SkyBlockMultiplayer.getInstance().getOwner(player.getLocation());
+						islandNumber = CreateIsland.getIslandNumber(player.getLocation());
 					} else {
-						owner = SkyBlockMultiplayer.getInstance().getOwner(b.getLocation());
+						islandNumber = CreateIsland.getIslandNumber(b.getLocation());
 					}
+					
+					String owner = SkyBlockMultiplayer.getInstance().getOwner(islandNumber);
 
 					if (owner.equals("")) {
-						if (b == null) {
-							islandNumber = CreateIsland.getIslandNumber(player.getLocation());
-						} else {
-							islandNumber = CreateIsland.getIslandNumber(b.getLocation());
-						}
-
 						if (islandNumber == 0) {
 							if (SkyBlockMultiplayer.getInstance().locationIsOnTower(player.getLocation())) {
 								player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_AREA_OF_SPAWN_TOWER.getSentence());
@@ -99,13 +86,7 @@ public class PlayerInteract implements Listener {
 						event.setCancelled(true);
 						return;
 					} else {
-						if (b == null) {
-							islandNumber = CreateIsland.getIslandNumber(player.getLocation());
-						} else {
-							islandNumber = CreateIsland.getIslandNumber(b.getLocation());
-						}
-
-						if (islandNumber == -1) {
+						if (islandNumber == 0) {
 							player.sendMessage(Language.MSGS_AREA_BORDERS.getSentence());
 							event.setCancelled(true);
 							return;
@@ -158,12 +139,8 @@ public class PlayerInteract implements Listener {
 		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.getInstance().getSettings().getWithProtectedArea()) {
 			return;
 		}
-
+		
 		if (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK || action == Action.PHYSICAL) {
-			if (action == Action.RIGHT_CLICK_BLOCK && item != null && b == null) { // this let allow the event BlockPlace calling
-				return;
-			}
-
 			if (b == null) {
 				if (pi.havePermissionThere(player.getLocation())) {
 					return;

@@ -22,7 +22,7 @@ public class PlayerUseBucket implements Listener {
 			return;
 		}
 
-		if (!player.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName())) { // Check if player is in world SkyBlockMultiplayer
+		if (!player.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) { // Check if player is in world SkyBlockMultiplayer
 			return;
 		}
 

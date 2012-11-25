@@ -22,8 +22,10 @@ public class PlayerPlaceBlock implements Listener {
 		if (!SkyBlockMultiplayer.getInstance().getSettings().getIsOnline()) {
 			return;
 		}
+		
+		System.out.println("ca.ee");
 
-		if (!player.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName())) { // Check if player is in world SkyBlockMultiplayer
+		if (!player.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) { // Check if player is in world SkyBlockMultiplayer
 			return;
 		}
 
@@ -53,25 +55,5 @@ public class PlayerPlaceBlock implements Listener {
 			return;
 		}
 		event.setCancelled(true);
-
-		/*PlayerInfo owner = SkyBlockMultiplayer.getOwner(b.getLocation());
-		if (owner == null) {
-			if (SkyBlockMultiplayer.canPlayerDoThat(pi, b.getLocation())) {
-				return;
-			}
-			event.setCancelled(true);
-			return;
-		}
-
-		if (owner.getPlayerName().equalsIgnoreCase(player.getName())) {
-			return;
-		}
-
-		if (owner.getFriends().contains(player.getName())) {
-			return;
-		}
-
-		event.setCancelled(true);
-		return;*/
 	}
 }

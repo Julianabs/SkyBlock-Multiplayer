@@ -37,7 +37,7 @@ public class ItemParser {
 			String[] parts = s.split("-");
 			int slot = Integer.parseInt(parts[0]);
 			ItemStack item = ItemParser.getItemStackfromString(parts[1]);
-			items[slot++] = item;
+			items[slot] = item;
 		}
 		return items;
 	}

@@ -23,7 +23,7 @@ public class PlayerDeath implements Listener {
 		}
 
 		Player player = (Player) ent;
-		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getSkyBlockWorld().getName())) { // Exit, if player not in SkyBlock
+		if (!player.getWorld().getName().equals(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) { // Exit, if player not in SkyBlock
 			return;
 		}
 
@@ -31,8 +31,10 @@ public class PlayerDeath implements Listener {
 		if (pi == null) { // Check, if player is in playerlist
 			return;
 		}
+		
+		System.out.println(pi.getIsOnIsland());
 
-		if (SkyBlockMultiplayer.getInstance().playerIsOnTower(player) && !pi.getIsOnIsland()) {
+		if (!pi.getIsOnIsland()) {
 			pi.setOldInventory(player.getInventory().getContents());
 			pi.setOldArmor(player.getInventory().getArmorContents());
 			pi.setOldExp(player.getExp());
@@ -85,7 +87,7 @@ public class PlayerDeath implements Listener {
 
 		for (PlayerInfo pInfo : SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfos().values()) {
 			if (pInfo.getPlayer() != null) {
-				if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
+				if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
 					pInfo.getPlayer().sendMessage(Language.MSGS_PLAYER_DIED1.getSentence() + Settings.numbersPlayers + Language.MSGS_PLAYER_DIED2.getSentence());
 				}
 			}
@@ -101,7 +103,7 @@ public class PlayerDeath implements Listener {
 
 			for (PlayerInfo pInfo : SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfos().values()) {
 				if (pInfo.getPlayer() != null) {
-					if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
+					if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
 						pInfo.getPlayer().sendMessage(Language.MSGS_PLAYER_WIN_BROADCAST1.getSentence() + winner + Language.MSGS_PLAYER_WIN_BROADCAST2.getSentence());
 					}
 				}
