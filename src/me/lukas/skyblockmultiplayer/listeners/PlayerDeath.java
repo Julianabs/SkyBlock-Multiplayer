@@ -1,8 +1,6 @@
 package me.lukas.skyblockmultiplayer.listeners;
 
 import me.lukas.skyblockmultiplayer.GameMode;
-import me.lukas.skyblockmultiplayer.Permissions;
-import me.lukas.skyblockmultiplayer.Settings;
 import me.lukas.skyblockmultiplayer.Language;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
@@ -31,10 +29,10 @@ public class PlayerDeath implements Listener {
 		if (pi == null) { // Check, if player is in playerlist
 			return;
 		}
-		
-		System.out.println(pi.getIsOnIsland());
 
-		if (!pi.getIsOnIsland()) {
+		System.out.println(pi.isPlaying());
+
+		if (!pi.isPlaying()) {
 			pi.setOldInventory(player.getInventory().getContents());
 			pi.setOldArmor(player.getInventory().getArmorContents());
 			pi.setOldExp(player.getExp());
@@ -80,20 +78,22 @@ public class PlayerDeath implements Listener {
 
 		SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 
-		if (Settings.numbersPlayers < 1) {
+		/*if (Settings.numbersPlayers < 1) {
 			return;
 		}
-		Settings.numbersPlayers--;
+		Settings.numbersPlayers--;*/
+
+		int amount = this.getAmountOfPlayingPlayers();
 
 		for (PlayerInfo pInfo : SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfos().values()) {
 			if (pInfo.getPlayer() != null) {
-				if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
-					pInfo.getPlayer().sendMessage(Language.MSGS_PLAYER_DIED1.getSentence() + Settings.numbersPlayers + Language.MSGS_PLAYER_DIED2.getSentence());
+				if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) {
+					pInfo.getPlayer().sendMessage(Language.MSGS_PLAYER_DIED1.getSentence() + amount + Language.MSGS_PLAYER_DIED2.getSentence());
 				}
 			}
 		}
 
-		if (Settings.numbersPlayers == 1) {
+		if (amount == 1) {
 			String winner = "";
 			for (PlayerInfo pinfo : SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfos().values()) {
 				if (pinfo.isDead() == false) {
@@ -103,12 +103,21 @@ public class PlayerDeath implements Listener {
 
 			for (PlayerInfo pInfo : SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfos().values()) {
 				if (pInfo.getPlayer() != null) {
-					if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName()) || (Permissions.SKYBLOCK_MESSAGES.has(pInfo.getPlayer()))) {
+					if (pInfo.getPlayer().getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) {
 						pInfo.getPlayer().sendMessage(Language.MSGS_PLAYER_WIN_BROADCAST1.getSentence() + winner + Language.MSGS_PLAYER_WIN_BROADCAST2.getSentence());
 					}
 				}
 			}
 			return;
 		}
+	}
+
+	private int getAmountOfPlayingPlayers() { // TODO: Looking
+		int amount = 0;
+		for (PlayerInfo pi : SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfos().values()) {
+			if (pi.isPlaying())
+				amount++;
+		}
+		return amount;
 	}
 }

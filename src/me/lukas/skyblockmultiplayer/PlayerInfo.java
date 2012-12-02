@@ -54,10 +54,10 @@ public class PlayerInfo {
 		this.oldLocation = null;
 
 		this.islandInventory = new ItemStack[36];
-		this.islandArmor = new ItemStack[36];
+		this.islandArmor = new ItemStack[4];
 
 		this.oldInventory = new ItemStack[36];
-		this.oldArmor = new ItemStack[36];
+		this.oldArmor = new ItemStack[4];
 
 		this.islandFood = 0;
 		this.oldFood = 0;
@@ -306,11 +306,11 @@ public class PlayerInfo {
 		return this.oldHealth;
 	}
 
-	public boolean getIsOnIsland() {
+	public boolean isPlaying() {
 		return this.isOnIsland;
 	}
 
-	public void setIsOnIsland(boolean b) {
+	public void setIsPlaying(boolean b) {
 		this.isOnIsland = b;
 	}
 

@@ -1,5 +1,6 @@
 package me.lukas.skyblockmultiplayer.listeners;
 
+import me.lukas.skyblockmultiplayer.IslandInfo;
 import me.lukas.skyblockmultiplayer.PlayerInfo;
 import me.lukas.skyblockmultiplayer.SkyBlockMultiplayer;
 
@@ -23,10 +24,14 @@ public class PlayerQuitsLogins implements Listener {
 		if (pi == null) { // Check, if player is in playerlist
 			return;
 		}
-		
+
 		SkyBlockMultiplayer.getInstance().getSettings().removePlayer(player.getName());
+
+		for (IslandInfo ii : pi.getBuiltPermissionList().values()) {
+			SkyBlockMultiplayer.getInstance().getSettings().removeIslandInfoIfNoBuilder(ii);
+		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
@@ -39,7 +44,7 @@ public class PlayerQuitsLogins implements Listener {
 		if (pi == null) { // Check, if player is in playerlist
 			return;
 		}
-		
+
 		// remove entites around player
 		SkyBlockMultiplayer.getInstance().removeCreatures(player.getLocation());
 	}

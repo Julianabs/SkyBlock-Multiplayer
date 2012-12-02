@@ -223,17 +223,16 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			} catch (Exception e) {
 				settings.setTowerYPosition(80);
 			}
-
-			/*try {
-				settings.islandYHeight = Integer.parseInt(this.getStringbyPath(this.configPlugin, this.filePlugin, ConfigPlugin.OPTIONS_SCHEMATIC_ISLAND_YHEIGHT.path, 64, true));
-				if (settings.islandYHeight < 0) {
-					settings.islandYHeight = 64;
+			
+			try {
+				settings.setIslandYPosition(Integer.parseInt(this.getStringbyPath(this.configPlugin, this.filePlugin, EnumPluginConfig.OPTIONS_SCHEMATIC_ISLAND_Y_POSITION.getPath(), 64, true)));
+				if (settings.getIslandYPosition() < 0) {
+					settings.setIslandYPosition(64);
 				}
 			} catch (Exception e) {
-				settings.islandYHeight = 64;
-			}*/
-
-			settings.setIslandYPosition(64);
+				settings.setIslandYPosition(64);
+			}
+			
 			settings.setItemsChest(itemsChest);
 			settings.setIsOnline(Boolean.parseBoolean(this.getStringbyPath(this.configPlugin, this.filePlugin, EnumPluginConfig.OPTIONS_SKYBLOCKONLINE.getPath(), true, true)));
 			settings.setLanguage(this.getStringbyPath(this.configPlugin, this.filePlugin, EnumPluginConfig.OPTIONS_LANGUAGE.getPath(), "english", true));
@@ -426,12 +425,12 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 
 		boolean isOnIsland = false;
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.IS_ON_ISLAND.getPath())) {
-			isOnIsland = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerConfig.IS_ON_ISLAND.getPath()).toString());
+		if (yamlPlayerInfo.contains(EnumPlayerConfig.IS_PLAYING.getPath())) {
+			isOnIsland = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerConfig.IS_PLAYING.getPath()).toString());
 		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.IS_ON_ISLAND.getPath(), false);
+			yamlPlayerInfo.set(EnumPlayerConfig.IS_PLAYING.getPath(), false);
 		}
-		pi.setIsOnIsland(isOnIsland);
+		pi.setIsPlaying(isOnIsland);
 
 		boolean isDead = false;
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.IS_DEAD.getPath())) {
@@ -573,11 +572,6 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		pi.setOldArmor(oldArmor);
 
-		/*yamlPlayerData.load(filePlayerData);
-		for (String friend : yamlPlayerData.getConfigurationSection("friends").getKeys(false)) {
-			
-		}*/
-
 		try {
 			yamlPlayerInfo.save(filePlayerInfo);
 		} catch (IOException e) {
@@ -596,7 +590,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_NUMBER.getPath(), pi.getIslandInfo().getIslandNumber());
 		}
 
-		yamlPlayerInfo.set(EnumPlayerConfig.IS_ON_ISLAND.getPath(), pi.getIsOnIsland());
+		yamlPlayerInfo.set(EnumPlayerConfig.IS_PLAYING.getPath(), pi.isPlaying());
 		yamlPlayerInfo.set(EnumPlayerConfig.IS_DEAD.getPath(), pi.isDead());
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_FOOD.getPath(), "" + pi.getIslandFood());
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_HEALTH.getPath(), "" + pi.getIslandHealth());
@@ -759,14 +753,14 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	/**
-	 *  Get the value from the config by path, if path not exists, it will be created with the given standard value.
-	 * 
-	 * @param fc a instance of FileConfiguration.
-	 * @param file a instance of File.
-	 * @param path the path to the value in the file.
-	 * @param stdValue the standard content, will be return if the path not exists.
-	 * @return object.
-	 */
+	*  Get the value from the config by path, if path not exists, it will be created with the given standard value.
+	* 
+	* @param fc a instance of FileConfiguration.
+	* @param file a instance of File.
+	* @param path the path to the value in the file.
+	* @param stdValue the standard content, will be return if the path not exists.
+	* @return object.
+	*/
 	public String getStringbyPath(FileConfiguration fc, File file, String path, Object stdValue, boolean addMissing) {
 		if (!fc.contains(path)) {
 			if (addMissing) {
@@ -822,7 +816,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		return this.skyBlockWorld;
 	}
-	
+
 	public void setSkyBlockWorldNull() {
 		this.skyBlockWorld = null;
 	}
@@ -1089,9 +1083,9 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	public void changeToOldInventory(PlayerInfo pi) {
-		if (!pi.getIsOnIsland())
+		if (!pi.isPlaying() || this.settings.getAllowContent())
 			return;
-		
+
 		// save island inventory
 		pi.setIslandInventory(pi.getPlayer().getInventory().getContents());
 		pi.setIslandArmor(pi.getPlayer().getInventory().getArmorContents());
@@ -1116,12 +1110,14 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		pi.getPlayer().setLevel(pi.getOldLevel());
 		pi.getPlayer().setExp(pi.getOldExp());
+
+		pi.setIsPlaying(false);
 	}
 
 	public void changeToIslandInventory(PlayerInfo pi) {
-		if (pi.getIsOnIsland())
+		if (pi.isPlaying() || this.settings.getAllowContent())
 			return;
-		
+
 		//save old inventory
 		pi.setOldInventory(pi.getPlayer().getInventory().getContents());
 		pi.setOldArmor(pi.getPlayer().getInventory().getArmorContents());
@@ -1146,5 +1142,11 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		pi.getPlayer().setLevel(pi.getIslandLevel());
 		pi.getPlayer().setExp(pi.getIslandExp());
+
+		pi.setIsPlaying(true);
+	}
+
+	public int getAmountOfIslands() {
+		return this.directoryIslands.listFiles().length;
 	}
 }

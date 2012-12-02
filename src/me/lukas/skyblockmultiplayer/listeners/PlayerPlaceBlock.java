@@ -22,8 +22,6 @@ public class PlayerPlaceBlock implements Listener {
 		if (!SkyBlockMultiplayer.getInstance().getSettings().getIsOnline()) {
 			return;
 		}
-		
-		System.out.println("ca.ee");
 
 		if (!player.getWorld().getName().equalsIgnoreCase(SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getName())) { // Check if player is in world SkyBlockMultiplayer
 			return;
