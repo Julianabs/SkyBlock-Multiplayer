@@ -217,6 +217,23 @@ public class Settings {
 	public void removePlayer(String playerName) {
 		this.players.remove(playerName);
 	}
+	
+	public void removeIslandInfoIfNoBuilder(IslandInfo ii){
+		if (ii == null || !this.islands.containsKey(ii.getIslandNumber()))
+			return;
+		// a) check if owner is online
+		
+		if (this.players.containsKey(ii.getIslandOwner()))
+			return;
+		// b) check if all friends are offline
+		for (String playername : ii.getFriends()){
+			if (this.players.containsKey(playername))
+				return;
+		}
+		this.islands.remove(ii.getIslandNumber());
+		
+	}
+
 
 	public HashMap<String, PlayerInfo> getPlayerInfos() {
 		return this.players;
@@ -244,6 +261,6 @@ public class Settings {
 
 	/* Needed for plugin */
 
-	public static int numbersPlayers; // Amount of players in SkyBlock
+	// public static int numbersPlayers; // Amount of players in SkyBlock
 
 }

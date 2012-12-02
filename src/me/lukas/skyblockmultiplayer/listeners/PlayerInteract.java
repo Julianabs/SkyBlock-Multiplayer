@@ -38,7 +38,7 @@ public class PlayerInteract implements Listener {
 		if (pi == null) { // Check, if player is in playerlist
 			event.setCancelled(true);
 			return;
-		}		
+		}
 
 		if (item != null) {
 			if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
@@ -61,13 +61,13 @@ public class PlayerInteract implements Listener {
 			if (item.getType() == Material.STICK) {
 				if (action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR) {
 					int islandNumber = 0;
-					
+
 					if (b == null) {
 						islandNumber = CreateIsland.getIslandNumber(player.getLocation());
 					} else {
 						islandNumber = CreateIsland.getIslandNumber(b.getLocation());
 					}
-					
+
 					String owner = SkyBlockMultiplayer.getInstance().getOwner(islandNumber);
 
 					if (owner.equals("")) {
@@ -93,7 +93,7 @@ public class PlayerInteract implements Listener {
 						}
 						player.sendMessage("Island number: " + islandNumber);
 					}
-					
+
 					player.sendMessage("Owner: " + owner);
 
 					// get friends
@@ -139,13 +139,18 @@ public class PlayerInteract implements Listener {
 		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.PVP || !SkyBlockMultiplayer.getInstance().getSettings().getWithProtectedArea()) {
 			return;
 		}
-		
+
 		if (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK || action == Action.PHYSICAL) {
 			if (b == null) {
 				if (pi.havePermissionThere(player.getLocation())) {
 					return;
 				}
 			} else {
+				// obsidian
+				if (item == null && b != null && b.getType() == Material.OBSIDIAN) {
+					b.setType(Material.LAVA);
+					return;
+				}
 				if (pi.havePermissionThere(b.getLocation())) {
 					return;
 				}

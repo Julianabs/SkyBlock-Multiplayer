@@ -90,7 +90,8 @@ public class CreateIsland {
 		}
 	}
 
-	public static int getAmountOfIslands() {
+	/*public static int getAmountOfIslands() {
+		return new File(SkyBlockMultiplayer.getInstance()-.)
 		int amountIslands = 1;
 		do {
 			Location locIsland = CreateIsland.getIslandPosition(amountIslands);
@@ -103,7 +104,7 @@ public class CreateIsland {
 			amountIslands++;
 		} while (true);
 		return amountIslands - 1;
-	}
+	}*/
 
 	public static int getIslandNumber(Location l) {
 		int px = l.getBlockX();
@@ -194,21 +195,23 @@ public class CreateIsland {
 	}
 
 	private static void createDefaultIsland(Location l) {
+		int yPosition = SkyBlockMultiplayer.getInstance().getSettings().getIslandYPosition();
+
 		// Erstelle unterste Erdebene
-		createLayer(l, 61, Material.DIRT);
+		createLayer(l, yPosition - 3, Material.DIRT);
 		//Erstelle mittlere Erdebene
-		createLayer(l, 62, Material.DIRT);
+		createLayer(l, yPosition - 2, Material.DIRT);
 		// Ersetze Erde durch Sand
 		for (int x = 2; x <= 4; x++) {
 			for (int z = -1; z <= 1; z++) {
-				SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getBlockAt(x + l.getBlockX(), SkyBlockMultiplayer.getInstance().getSettings().getIslandYPosition() - 2, z + l.getBlockZ()).setType(Material.SAND);
+				SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getBlockAt(x + l.getBlockX(), yPosition - 2, z + l.getBlockZ()).setType(Material.SAND);
 			}
 		}
 		//Erstelle oberste Grassebene
-		createLayer(l, 63, Material.GRASS);
+		createLayer(l, yPosition - 1, Material.GRASS);
 
 		// create Chest		
-		Block block = SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getBlockAt(0 + l.getBlockX(), SkyBlockMultiplayer.getInstance().getSettings().getIslandYPosition(), 4 + l.getBlockZ());
+		Block block = SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getBlockAt(0 + l.getBlockX(), yPosition, 4 + l.getBlockZ());
 		block.setType(Material.CHEST);
 		Chest chest = (Chest) block.getState();
 		chest.getBlock().setData((byte) 2);
@@ -221,7 +224,7 @@ public class CreateIsland {
 		}
 
 		// create tree
-		SkyBlockMultiplayer.getInstance().getSkyBlockWorld().generateTree(new Location(SkyBlockMultiplayer.getInstance().getSkyBlockWorld(), 5 + l.getBlockX(), 64, l.getBlockZ()), TreeType.TREE);
+		SkyBlockMultiplayer.getInstance().getSkyBlockWorld().generateTree(new Location(SkyBlockMultiplayer.getInstance().getSkyBlockWorld(), 5 + l.getBlockX(), yPosition, l.getBlockZ()), TreeType.TREE);
 
 		// place bedrock
 		SkyBlockMultiplayer.getInstance().getSkyBlockWorld().getBlockAt(l.getBlockX(), l.getBlockY() - 3, l.getBlockZ()).setType(Material.BEDROCK);

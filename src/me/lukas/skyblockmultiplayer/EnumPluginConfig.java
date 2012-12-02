@@ -10,7 +10,6 @@ public enum EnumPluginConfig {
 	OPTIONS_GAMEMODE("options.gameMode", "build"),
 	OPTIONS_WORLDNAME("options.worldName", SkyBlockMultiplayer.getInstance().getSettings().getWorldName()),
 	OPTIONS_CLOSED("options.closed", false),
-	//OPTIONS_MESSAGES_OUTSIDE("options.messagesOutside", false),
 	OPTIONS_REMOVECREATURESBYTELEPORT("options.removeCreaturesByTeleport", true),
 	OPTIONS_PVP("options.pvp", ""),
 	OPTIONS_PVP_LIVESPERISLAND("options.pvp.livesPerIsland", 1),
@@ -20,7 +19,7 @@ public enum EnumPluginConfig {
 	OPTIONS_BUILD_ALLOWENDERPEARL("options.build.allowEnderPearl", false),
 	OPTIONS_BUILD_WITHPROTECTEDBORDER("options.build.withProtectedBorder", true),
 	OPTIONS_SCHEMATIC_ISLAND_FILENAME("options.schematic.island.fileName", ""),
-	// OPTIONS_SCHEMATIC_ISLAND_YHEIGHT("options.schematic.island.yHeight", 64),
+	OPTIONS_SCHEMATIC_ISLAND_Y_POSITION("options.schematic.island.yHeight", 64),
 	OPTIONS_SCHEMATIC_TOWER_FILENAME("options.schematic.tower.fileName", ""),
 	OPTIONS_SCHEMATIC_TOWER_YHEIGHT("options.schematic.tower.yHeight", 80);
 

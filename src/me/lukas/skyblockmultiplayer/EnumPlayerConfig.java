@@ -6,7 +6,7 @@ public enum EnumPlayerConfig {
 	ISLAND_NUMBER("islandNumber"),
 	ISLAND_BUILTLIST("buildlist"),
 	IS_DEAD("isDead"),
-	IS_ON_ISLAND("isOnIsland"),
+	IS_PLAYING("isPlaying"),
 	LIVES_LEFT("livesLeft"),
 	ISLANDS_LEFT("islandsLeft"),
 
