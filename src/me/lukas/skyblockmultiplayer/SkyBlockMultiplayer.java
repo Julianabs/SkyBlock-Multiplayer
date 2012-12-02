@@ -1083,8 +1083,13 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	public void changeToOldInventory(PlayerInfo pi) {
-		if (!pi.isPlaying() || this.settings.getAllowContent())
+		if (!pi.isPlaying())
 			return;
+
+		if (this.settings.getAllowContent()) {
+			pi.setIsPlaying(true);
+			return;
+		}
 
 		// save island inventory
 		pi.setIslandInventory(pi.getPlayer().getInventory().getContents());
@@ -1115,8 +1120,13 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	public void changeToIslandInventory(PlayerInfo pi) {
-		if (pi.isPlaying() || this.settings.getAllowContent())
+		if (pi.isPlaying())
 			return;
+
+		if (this.settings.getAllowContent()) {
+			pi.setIsPlaying(true);
+			return;
+		}
 
 		//save old inventory
 		pi.setOldInventory(pi.getPlayer().getInventory().getContents());
