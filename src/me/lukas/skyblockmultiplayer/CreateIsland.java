@@ -257,7 +257,7 @@ public class CreateIsland {
 		return false;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes", "resource" })
 	public static int createStructure(Location loc, File path) throws Exception {
 		FileInputStream stream = new FileInputStream(path);
 		NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(stream));

@@ -12,7 +12,7 @@ public class PlayerInfo {
 	private String playerName;
 
 	private IslandInfo islandInfo;
-	private boolean isOnIsland;
+	private boolean isPlaying;
 	private boolean isDead;
 
 	private int livesLeft;
@@ -44,6 +44,7 @@ public class PlayerInfo {
 
 		this.playerName = playerName;
 
+		this.isPlaying = false;
 		this.isDead = false;
 
 		this.livesLeft = SkyBlockMultiplayer.getInstance().getSettings().getLivesPerIsland();
@@ -78,11 +79,11 @@ public class PlayerInfo {
 	}
 
 	public Player getPlayer() {
-		return Bukkit.getPlayer(this.playerName.toString());
+		return Bukkit.getPlayer(this.playerName);
 	}
 
 	public String getPlayerName() {
-		return this.playerName.toString();
+		return this.playerName;
 	}
 
 	public boolean getHasIsland() {
@@ -167,7 +168,7 @@ public class PlayerInfo {
 
 	public void setIslandArmor(ItemStack[] items) {
 		if (items == null)
-			items = new ItemStack[36];
+			items = new ItemStack[4];
 		this.islandArmor = items;
 	}
 
@@ -187,7 +188,7 @@ public class PlayerInfo {
 
 	public void setOldArmor(ItemStack[] items) {
 		if (items == null)
-			items = new ItemStack[36];
+			items = new ItemStack[4];
 		this.oldArmor = items;
 	}
 
@@ -307,11 +308,11 @@ public class PlayerInfo {
 	}
 
 	public boolean isPlaying() {
-		return this.isOnIsland;
+		return this.isPlaying;
 	}
 
 	public void setIsPlaying(boolean b) {
-		this.isOnIsland = b;
+		this.isPlaying = b;
 	}
 
 	public void setIslandInfo(IslandInfo ii) {

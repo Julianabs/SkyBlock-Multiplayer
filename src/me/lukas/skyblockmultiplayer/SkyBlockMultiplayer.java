@@ -1087,7 +1087,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			return;
 
 		if (this.settings.getAllowContent()) {
-			pi.setIsPlaying(true);
+			pi.setIsPlaying(false);
 			return;
 		}
 
