@@ -43,6 +43,7 @@ public class PlayerBreackBlock implements Listener {
 		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() == GameMode.BUILD) {
 			PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 			if (pi == null) { // Check, if player is in playerlist
+				event.setCancelled(true);
 				return;
 			}
 

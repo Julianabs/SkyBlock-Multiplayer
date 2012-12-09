@@ -11,10 +11,12 @@ public class IslandInfo {
 	private ArrayList<String> friends;
 	private Location homeLocation;
 	private Location islandLocation;
+	private boolean freeBuild;
 
 	public IslandInfo(int islandNr) {
 		this.islandNumber = islandNr;
 		this.friends = new ArrayList<String>();
+		this.freeBuild = false;
 	}
 
 	public String getIslandOwner() {
@@ -70,5 +72,13 @@ public class IslandInfo {
 
 	public int getIslandNumber() {
 		return this.islandNumber;
+	}
+
+	public boolean isFreeBuild() {
+		return this.freeBuild;
+	}
+	
+	public void setFreeBuild(boolean b) {
+		this.freeBuild = b;
 	}
 }

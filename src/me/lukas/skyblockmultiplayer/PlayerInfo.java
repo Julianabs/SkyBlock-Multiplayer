@@ -205,14 +205,17 @@ public class PlayerInfo {
 	}
 
 	public boolean havePermissionThere(Location l) {
+		System.out.println("called");
 		int islandNumber = CreateIsland.getIslandNumber(l);
+
 		if (islandNumber == 0) {
 			return false;
 		}
+
 		return this.havePermissionThere(islandNumber);
 	}
 
-	public boolean havePermissionThere(int islandnr) {
+	private boolean havePermissionThere(int islandnr) {
 		// Check own island
 		if (this.islandInfo != null && islandnr == this.islandInfo.getIslandNumber()) {
 			return true;
@@ -220,12 +223,16 @@ public class PlayerInfo {
 		// check island list
 		IslandInfo built = this.buildPermissions.get(islandnr);
 		if (built == null) {
+			/*IslandInfo ii = SkyBlockMultiplayer.getInstance().getSettings().getIslandInfo(islandnr);
+			if (ii != null && ii.isFreeBuild())
+				return true;*/
 			return false;
 		}
 
 		if (built.containsFriend(this.playerName)) {
 			return true;
 		}
+
 		return false;
 	}
 

@@ -146,12 +146,12 @@ public class PlayerInteract implements Listener {
 					return;
 				}
 			} else {
-				// obsidian
-				if (item == null && b != null && b.getType() == Material.OBSIDIAN) {
-					b.setType(Material.LAVA);
-					return;
-				}
 				if (pi.havePermissionThere(b.getLocation())) {
+					// obsidian
+					if (item == null && b != null && b.getType() == Material.OBSIDIAN) {
+						b.setType(Material.LAVA);
+						return;
+					}
 					return;
 				}
 			}

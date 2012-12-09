@@ -912,11 +912,8 @@ public class SkyBlockCommand implements CommandExecutor {
 				return true;
 			}
 
-			// TODO: Reset method
+			SkyBlockMultiplayer.getInstance().removeIsland(pi.getIslandLocation());
 			pi.setIslandInfo(null);
-
-			Location l = pi.getIslandLocation();
-			SkyBlockMultiplayer.getInstance().removeIsland(l);
 
 			SkyBlockMultiplayer.getInstance().savePlayerInfo(pi);
 			this.playerStart(player);
@@ -1125,7 +1122,7 @@ public class SkyBlockCommand implements CommandExecutor {
 
 		PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
 		if (pi == null) {
-			this.playerStart(player); // TODO: Look if thats correct
+			this.playerStart(player);
 			return true;
 		}
 

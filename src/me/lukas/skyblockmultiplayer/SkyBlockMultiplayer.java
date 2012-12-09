@@ -152,7 +152,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			settings.setIslandsPerPlayer(1);
 			settings.setLivesPerIsland(1);
 			settings.setRespawnWithInventory(true);
-			settings.setWithProtectedArea(false);
+			settings.setWithProtectedArea(true);
 			settings.setAllowEnderPearl(false);
 			settings.setWorldName(this.getDescription().getName());
 			settings.setRemoveCreaturesByTeleport(true);
@@ -223,7 +223,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			} catch (Exception e) {
 				settings.setTowerYPosition(80);
 			}
-			
+
 			try {
 				settings.setIslandYPosition(Integer.parseInt(this.getStringbyPath(this.configPlugin, this.filePlugin, EnumPluginConfig.OPTIONS_SCHEMATIC_ISLAND_Y_POSITION.getPath(), 64, true)));
 				if (settings.getIslandYPosition() < 0) {
@@ -232,7 +232,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			} catch (Exception e) {
 				settings.setIslandYPosition(64);
 			}
-			
+
 			settings.setItemsChest(itemsChest);
 			settings.setIsOnline(Boolean.parseBoolean(this.getStringbyPath(this.configPlugin, this.filePlugin, EnumPluginConfig.OPTIONS_SKYBLOCKONLINE.getPath(), true, true)));
 			settings.setLanguage(this.getStringbyPath(this.configPlugin, this.filePlugin, EnumPluginConfig.OPTIONS_LANGUAGE.getPath(), "english", true));
@@ -251,6 +251,11 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	public void loadIslandFiles() {
+		ArrayList<String> playersInSkb = new ArrayList<String>();
+		for (Player player : this.skyBlockWorld.getPlayers()) {
+			playersInSkb.add(player.getName());
+		}
+
 		for (String f : new File(this.directoryIslands.getAbsolutePath()).list()) {
 			if (new File(this.directoryIslands, f).isFile()) {
 
@@ -262,8 +267,25 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 					continue;
 				}
 				if (ii != null) {
-					settings.addIslandInfo(ii);
-					System.out.println("aded island from " + ii.getIslandOwner());
+					if (ii.isFreeBuild()) {
+						settings.addIslandInfo(ii);
+						continue;
+					}
+
+					// check if a player for this island (owner or friend is online)
+					boolean foundPlayer = false;
+					if (playersInSkb.contains(ii.getIslandOwner())) {
+						foundPlayer = true;
+					} else {
+						for (String friend : ii.getFriends()) {
+							if (playersInSkb.contains(friend)) {
+								foundPlayer = true;
+								break;
+							}
+						}
+					}
+					if (foundPlayer)
+						settings.addIslandInfo(ii);
 				}
 			}
 		}
@@ -319,6 +341,14 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 		ii.setFriends(friends);
 
+		boolean freeBuild = false;
+		if (yamlIslandInfo.contains(EnumIslandConfig.FREE_BUILD.getPath())) {
+			freeBuild = Boolean.parseBoolean(yamlIslandInfo.get(EnumIslandConfig.FREE_BUILD.getPath()).toString());
+		} else {
+			yamlIslandInfo.set(EnumIslandConfig.FREE_BUILD.getPath(), ii.isFreeBuild());
+		}
+		ii.setFreeBuild(freeBuild);
+
 		try {
 			yamlIslandInfo.save(fileIslandInfo);
 		} catch (IOException e) {
@@ -366,9 +396,11 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 					String playerName = pi.getPlayerName();
 
 					Player playerOnline = this.getServer().getPlayer(playerName);
-					if (playerOnline == null || !playerOnline.isOnline() || pi.getIslandLocation() == null || !playerOnline.getWorld().getName().equalsIgnoreCase(settings.getWorldName())) {
+					if (playerOnline == null)
 						continue;
-					}
+					/*if (playerOnline == null || !playerOnline.isOnline() || pi.getIslandLocation() == null || !playerOnline.getWorld().getName().equalsIgnoreCase(settings.getWorldName())) {
+						continue;
+					}*/
 
 					settings.addPlayer(playerName, pi);
 				}
@@ -424,13 +456,13 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			}
 		}
 
-		boolean isOnIsland = false;
+		boolean isPlaying = false;
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.IS_PLAYING.getPath())) {
-			isOnIsland = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerConfig.IS_PLAYING.getPath()).toString());
+			isPlaying = Boolean.parseBoolean(yamlPlayerInfo.get(EnumPlayerConfig.IS_PLAYING.getPath()).toString());
 		} else {
 			yamlPlayerInfo.set(EnumPlayerConfig.IS_PLAYING.getPath(), false);
 		}
-		pi.setIsPlaying(isOnIsland);
+		pi.setIsPlaying(isPlaying);
 
 		boolean isDead = false;
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.IS_DEAD.getPath())) {
@@ -779,12 +811,12 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	public World getSkyBlockWorld() {
 		if (this.skyBlockWorld == null) {
 			boolean folderExists = new File(SkyBlockMultiplayer.getInstance().settings.getWorldName()).exists();
-			this.skyBlockWorld = WorldCreator.name(SkyBlockMultiplayer.getInstance().getSettings().getWorldName()).type(WorldType.FLAT).environment(Environment.NORMAL).generator(new SkyBlockChunkGenerator()).createWorld();
+			this.skyBlockWorld = WorldCreator.name(this.settings.getWorldName()).type(WorldType.FLAT).environment(Environment.NORMAL).generator(new SkyBlockChunkGenerator()).createWorld();
 			if (!folderExists) {
-				File f = new File(SkyBlockMultiplayer.getInstance().getSettings().getIslandSchematic());
+				File f = new File(this.settings.getIslandSchematic());
 				if (f.exists() && f.isFile()) {
 					try {
-						CreateIsland.createStructure(new Location(getSkyBlockWorld(), 0, SkyBlockMultiplayer.getInstance().getSettings().getTowerYPosition(), 0), f);
+						CreateIsland.createStructure(new Location(getSkyBlockWorld(), 0, this.settings.getTowerYPosition(), 0), f);
 						this.skyBlockWorld.setSpawnLocation(0, this.skyBlockWorld.getHighestBlockYAt(0, 0), 0);
 						return this.skyBlockWorld;
 					} catch (Exception e) {
@@ -795,10 +827,10 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 					}
 				}
 
-				f = new File(SkyBlockMultiplayer.getInstance().getDataFolder(), SkyBlockMultiplayer.getInstance().getSettings().getTowerSchematic());
+				f = new File(SkyBlockMultiplayer.getInstance().getDataFolder(), this.settings.getTowerSchematic());
 				if (f.exists() && f.isFile()) {
 					try {
-						CreateIsland.createStructure(new Location(getSkyBlockWorld(), 0, SkyBlockMultiplayer.getInstance().getSettings().getTowerYPosition(), 0), f);
+						CreateIsland.createStructure(new Location(getSkyBlockWorld(), 0, this.settings.getTowerYPosition(), 0), f);
 						this.skyBlockWorld.setSpawnLocation(0, this.skyBlockWorld.getHighestBlockYAt(0, 0), 0);
 						return this.skyBlockWorld;
 					} catch (Exception e) {
@@ -1002,7 +1034,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			return false;
 		if (ground.getType() == Material.STATIONARY_WATER)
 			return false;
-		if (air1.getType() == Material.AIR && air2.getType() == Material.AIR)
+		if ((air1.getType() == Material.AIR && air2.getType() == Material.AIR) || (air1.getType() == Material.WATER && air2.getType() == Material.AIR))
 			return true;
 		return false;
 	}
@@ -1013,7 +1045,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	 * @param l
 	 */
 	public void removeCreatures(Location l) {
-		if (!getSettings().getRemoveCreaturesByTeleport() || l == null) {
+		if (!this.settings.getRemoveCreaturesByTeleport() || l == null) {
 			return;
 		}
 
@@ -1074,7 +1106,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	public String getOwner(int islandNumber) {
-		IslandInfo ii = SkyBlockMultiplayer.getInstance().getSettings().getIslandInfo(islandNumber);
+		IslandInfo ii = this.settings.getIslandInfo(islandNumber);
 
 		if (ii == null) {
 			return "";
@@ -1157,6 +1189,6 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	}
 
 	public int getAmountOfIslands() {
-		return this.directoryIslands.listFiles().length;
+		return this.directoryIslands.list().length;
 	}
 }

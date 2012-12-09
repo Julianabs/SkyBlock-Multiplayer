@@ -6,7 +6,8 @@ public enum EnumIslandConfig {
 	FRIENDS("friends"),
 	ISLAND_OWNER("islandOwner"),
 	ISLAND_LOCATION("islandLocation"),
-	HOME_LOCATION("homeLocation");
+	HOME_LOCATION("homeLocation"),
+	FREE_BUILD("freeBuild");
 
 	private StringBuilder path;
 

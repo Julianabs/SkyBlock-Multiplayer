@@ -74,6 +74,7 @@ public class CreateIsland {
 		IslandInfo islandInfo = new IslandInfo(numberIslands);
 		islandInfo.setIslandLocation(l);
 		SkyBlockMultiplayer.getInstance().getSettings().addIslandInfo(islandInfo);
+		SkyBlockMultiplayer.getInstance().getSettings().addIslandInfo(islandInfo);
 		return islandInfo;
 	}
 
@@ -84,8 +85,10 @@ public class CreateIsland {
 			while (checkIfOccupied(l)) {
 				numberIslands++;
 				l = getIslandPosition(numberIslands);
-				//System.out.println(numberIslands + " : Location " + SkyBlockMultiplayer.getStringLocation(l));
 			}
+			IslandInfo ii = new IslandInfo(numberIslands);
+			ii.setIslandLocation(l);
+			SkyBlockMultiplayer.getInstance().saveIslandInfo(ii);
 			createIslandAtLocation(l);
 		}
 	}
@@ -257,7 +260,7 @@ public class CreateIsland {
 		return false;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes", "resource" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static int createStructure(Location loc, File path) throws Exception {
 		FileInputStream stream = new FileInputStream(path);
 		NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(stream));

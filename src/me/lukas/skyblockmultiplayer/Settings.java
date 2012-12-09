@@ -1,5 +1,6 @@
 package me.lukas.skyblockmultiplayer;
 
+import java.util.Collection;
 import java.util.HashMap;
 import org.bukkit.inventory.ItemStack;
 
@@ -138,6 +139,10 @@ public class Settings {
 	}
 
 	public void setGameMode(GameMode gm) {
+		/*if (gm == GameMode.PVP)
+			SkyBlockMultiplayer.getInstance().getSkyBlockWorld().setPVP(true);
+		else
+			SkyBlockMultiplayer.getInstance().getSkyBlockWorld().setPVP(false);*/
 		this.gameMode = gm;
 	}
 
@@ -217,23 +222,22 @@ public class Settings {
 	public void removePlayer(String playerName) {
 		this.players.remove(playerName);
 	}
-	
-	public void removeIslandInfoIfNoBuilder(IslandInfo ii){
+
+	public void removeIslandInfoIfNoBuilder(IslandInfo ii) {
 		if (ii == null || !this.islands.containsKey(ii.getIslandNumber()))
 			return;
 		// a) check if owner is online
-		
+
 		if (this.players.containsKey(ii.getIslandOwner()))
 			return;
 		// b) check if all friends are offline
-		for (String playername : ii.getFriends()){
+		for (String playername : ii.getFriends()) {
 			if (this.players.containsKey(playername))
 				return;
 		}
 		this.islands.remove(ii.getIslandNumber());
-		
-	}
 
+	}
 
 	public HashMap<String, PlayerInfo> getPlayerInfos() {
 		return this.players;
@@ -244,7 +248,8 @@ public class Settings {
 	}
 
 	public IslandInfo getIslandInfo(int islandNumber) {
-		if (islandNumber == 0) return null;
+		if (islandNumber == 0)
+			return null;
 		IslandInfo ii = this.islands.get(islandNumber);
 		if (ii == null) {
 			ii = SkyBlockMultiplayer.getInstance().loadIslandInfo(islandNumber + ".yml");
@@ -257,6 +262,10 @@ public class Settings {
 
 	public void addIslandInfo(IslandInfo ii) {
 		this.islands.put(ii.getIslandNumber(), ii);
+	}
+
+	public Collection<IslandInfo> getIslands() {
+		return this.islands.values();
 	}
 
 	/* Needed for plugin */
