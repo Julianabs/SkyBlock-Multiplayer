@@ -9,14 +9,8 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import me.lukas.skyblockmultiplayer.listeners.PlayerDeath;
-import me.lukas.skyblockmultiplayer.listeners.PlayerBreackBlock;
-import me.lukas.skyblockmultiplayer.listeners.PlayerInteract;
-import me.lukas.skyblockmultiplayer.listeners.PlayerPlaceBlock;
-import me.lukas.skyblockmultiplayer.listeners.PlayerQuitsLogins;
-import me.lukas.skyblockmultiplayer.listeners.PlayerRespawn;
-import me.lukas.skyblockmultiplayer.listeners.PlayerTeleport;
-import me.lukas.skyblockmultiplayer.listeners.PlayerUseBucket;
+import me.lukas.skyblockmultiplayer.listeners.*;
+import me.lukas.skyblockmultiplayer.parser.*;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -39,6 +33,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -159,6 +154,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			settings.setIslandSchematic("");
 			settings.setIslandYPosition(64);
 			settings.setTowerSchematic("");
+			
 			settings.setTowerYPosition(80);
 
 			for (EnumPluginConfig c : EnumPluginConfig.values()) {
@@ -192,7 +188,8 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 							if (dataValues.length == 2) {
 								alitemsChest.add(new ItemStack(id, amount));
 							} else if (dataValues.length == 3) {
-								alitemsChest.add(new ItemStack(id, amount, (short) 0, Byte.parseByte(dataValues[2])));
+								MaterialData md = new MaterialData(id, Byte.parseByte(dataValues[2]));
+								alitemsChest.add(md.toItemStack(amount));
 							}
 						}
 
@@ -518,8 +515,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 		ItemStack[] islandInventory = new ItemStack[36];
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_INVENTORY.getPath())) {
-			ArrayList<String> listIslandInventory = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_INVENTORY.getPath());
-			islandInventory = ItemParser.getItemStackArrayFromList(listIslandInventory, 36);
+			islandInventory = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.ISLAND_INVENTORY.getPath()), 36);
 		} else {
 			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), new ArrayList<String>());
 		}
@@ -527,8 +523,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 		ItemStack[] islandArmor = new ItemStack[4];
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_ARMOR.getPath())) {
-			ArrayList<String> listIslandArmor = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.ISLAND_ARMOR.getPath());
-			islandArmor = ItemParser.getItemStackArrayFromList(listIslandArmor, 4);
+			islandArmor = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.ISLAND_ARMOR.getPath()), 4);
 		} else {
 			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), new ArrayList<String>());
 		}
@@ -588,8 +583,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 		ItemStack[] oldInventory = new ItemStack[36];
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_INVENTORY.getPath())) {
-			ArrayList<String> listOldInventory = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.OLD_INVENTORY.getPath());
-			oldInventory = ItemParser.getItemStackArrayFromList(listOldInventory, 36);
+			oldInventory = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.OLD_INVENTORY.getPath()), 36);
 		} else {
 			yamlPlayerInfo.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), new ArrayList<String>());
 		}
@@ -597,8 +591,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 		ItemStack[] oldArmor = new ItemStack[4];
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_ARMOR.getPath())) {
-			ArrayList<String> listOldArmor = (ArrayList<String>) yamlPlayerInfo.get(EnumPlayerConfig.OLD_ARMOR.getPath());
-			oldArmor = ItemParser.getItemStackArrayFromList(listOldArmor, 4);
+			oldArmor = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.OLD_ARMOR.getPath()), 4);
 		} else {
 			yamlPlayerInfo.set(EnumPlayerConfig.OLD_ARMOR.getPath(), new ArrayList<String>());
 		}
@@ -628,15 +621,15 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_HEALTH.getPath(), "" + pi.getIslandHealth());
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_EXP.getPath(), "" + pi.getIslandExp());
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_LEVEL.getPath(), "" + pi.getIslandLevel());
-		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), ItemParser.getListFromItemStackArray(pi.getIslandInventory()));
-		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), ItemParser.getListFromItemStackArray(pi.getIslandArmor()));
+		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getIslandInventory()));
+		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getIslandArmor()));
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_LOCATION.getPath(), LocationParser.getStringFromLocation(pi.getOldLocation()));
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_FOOD.getPath(), "" + pi.getOldFood());
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_HEALTH.getPath(), "" + pi.getOldHealth());
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_EXP.getPath(), "" + pi.getOldExp());
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_LEVEL.getPath(), "" + pi.getOldLevel());
-		yamlPlayerInfo.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), ItemParser.getListFromItemStackArray(pi.getOldInventory()));
-		yamlPlayerInfo.set(EnumPlayerConfig.OLD_ARMOR.getPath(), ItemParser.getListFromItemStackArray(pi.getOldArmor()));
+		yamlPlayerInfo.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getOldInventory()));
+		yamlPlayerInfo.set(EnumPlayerConfig.OLD_ARMOR.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getOldArmor()));
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_BUILTLIST.getPath(), pi.getBuildListNumbers());
 
 		try {
