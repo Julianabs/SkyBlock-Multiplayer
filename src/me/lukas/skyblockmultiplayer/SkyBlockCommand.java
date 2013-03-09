@@ -3,6 +3,7 @@ package me.lukas.skyblockmultiplayer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import org.bukkit.Bukkit;
@@ -14,6 +15,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SkyBlockCommand implements CommandExecutor {
+
+	private HashMap<String, Long> listRestartIslands = new HashMap<String, Long>();
 
 	/**
 	 * 	
@@ -203,7 +206,15 @@ public class SkyBlockCommand implements CommandExecutor {
 				return this.playerNewIsland(player, s);
 			}
 
-			if (args[0].equalsIgnoreCase("remove")) {
+			if (args[0].equalsIgnoreCase("newisland")) {
+				if (args.length == 1) {
+					return this.restartIsland(player, "");
+				}
+
+				return this.restartIsland(player, args[1]);
+			}
+
+			if (args[0].equalsIgnoreCase("remove")) { // TODO: Rechange this
 				if (args.length == 0) {
 					player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
 					return true;
@@ -1343,6 +1354,38 @@ public class SkyBlockCommand implements CommandExecutor {
 
 		SkyBlockMultiplayer.getInstance().saveIslandInfo(pi.getIslandInfo());
 		player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_FRIEND_REMOVED.getSentence());
+		return true;
+	}
+
+	private boolean restartIsland(Player player, String arg) {  // TODO: Test needed.
+		PlayerInfo pi = SkyBlockMultiplayer.getInstance().getSettings().getPlayerInfo(player.getName());
+		if (pi == null || !pi.getHasIsland()) {
+			return true;
+		}
+
+		if (SkyBlockMultiplayer.getInstance().getSettings().getGameMode() != GameMode.BUILD) {
+			player.sendMessage("You can use this command only in build mode.");
+			return true;
+		}
+
+		if (arg.equalsIgnoreCase("replace")) {
+			if (this.listRestartIslands.containsKey(player.getName())) {
+				long stopTime = System.currentTimeMillis();
+				long startTime = this.listRestartIslands.get(player.getName());
+
+				if ((stopTime - startTime) >= 15000) {
+					this.listRestartIslands.put(player.getName(), System.currentTimeMillis());
+					player.sendMessage("If you really want to restart your own island. Then type '/sky newisland replace' within 15 seconds.");
+					return true;
+				}
+
+				SkyBlockMultiplayer.getInstance().removeIsland(pi.getIslandInfo().getIslandLocation());
+				return this.playerStart(player);
+			}
+		}
+
+		this.listRestartIslands.put(player.getName(), System.currentTimeMillis());
+		player.sendMessage("If you really want to restart your own island. Then type '/sky newisland replace' within 15 seconds.");
 		return true;
 	}
 }
