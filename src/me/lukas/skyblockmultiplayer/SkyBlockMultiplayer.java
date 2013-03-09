@@ -88,16 +88,14 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		this.directoryIslands = new File(this.getDataFolder() + File.separator + "islands");
 		if (!this.directoryIslands.exists()) {
 			this.directoryIslands.mkdir();
-		} else {
-			this.loadIslandFiles();
 		}
 
 		this.directoryPlayers = new File(this.getDataFolder() + File.separator + "players");
 		if (!this.directoryPlayers.exists()) {
 			this.directoryPlayers.mkdir();
-		} else {
-			this.loadPlayerFiles();
 		}
+		
+		this.loadPlayersAndIslandFiles();
 
 		// register command
 		this.getCommand("skyblock").setExecutor(new SkyBlockCommand());
@@ -154,7 +152,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			settings.setIslandSchematic("");
 			settings.setIslandYPosition(64);
 			settings.setTowerSchematic("");
-			
+
 			settings.setTowerYPosition(80);
 
 			for (EnumPluginConfig c : EnumPluginConfig.values()) {
@@ -247,10 +245,14 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 	}
 
-	public void loadIslandFiles() {
+	public void loadPlayersAndIslandFiles() {
 		ArrayList<String> playersInSkb = new ArrayList<String>();
 		for (Player player : this.skyBlockWorld.getPlayers()) {
 			playersInSkb.add(player.getName());
+
+			PlayerInfo pi = this.loadPlayerInfo(player.getName());
+			if (pi != null)
+				this.settings.addPlayerInfo(pi);
 		}
 
 		for (String f : new File(this.directoryIslands.getAbsolutePath()).list()) {
@@ -265,7 +267,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 				}
 				if (ii != null) {
 					if (ii.isFreeBuild()) {
-						settings.addIslandInfo(ii);
+						this.settings.addIslandInfo(ii);
 						continue;
 					}
 
@@ -282,7 +284,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 						}
 					}
 					if (foundPlayer)
-						settings.addIslandInfo(ii);
+						this.settings.addIslandInfo(ii);
 				}
 			}
 		}
@@ -309,7 +311,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		if (yamlIslandInfo.contains(EnumIslandConfig.ISLAND_OWNER.getPath())) {
 			islandOwner = yamlIslandInfo.get(EnumIslandConfig.ISLAND_OWNER.getPath()).toString();
 		} else {
-			yamlIslandInfo.set(EnumIslandConfig.ISLAND_OWNER.getPath(), false);
+			yamlIslandInfo.set(EnumIslandConfig.ISLAND_OWNER.getPath(), "");
 		}
 		ii.setIslandOwner(islandOwner);
 
@@ -369,39 +371,6 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 			yamlIslandInfo.save(filePlayerInfo);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Load all informations from player who exists in folder players and who have a island.
-	 * 
-	 */
-	public void loadPlayerFiles() {
-		for (String f : new File(this.directoryPlayers.getAbsolutePath()).list()) {
-			if (new File(this.directoryPlayers, f).isFile()) {
-
-				PlayerInfo pi = null;
-				try {
-					pi = this.loadPlayerInfo(f.replace(".yml", ""));
-				} catch (Exception e) {
-					e.printStackTrace();
-					continue;
-				}
-
-				if (pi != null) {
-					// add player, if missing
-					String playerName = pi.getPlayerName();
-
-					Player playerOnline = this.getServer().getPlayer(playerName);
-					if (playerOnline == null)
-						continue;
-					/*if (playerOnline == null || !playerOnline.isOnline() || pi.getIslandLocation() == null || !playerOnline.getWorld().getName().equalsIgnoreCase(settings.getWorldName())) {
-						continue;
-					}*/
-
-					settings.addPlayer(playerName, pi);
-				}
-			}
 		}
 	}
 
