@@ -878,7 +878,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			player.teleport(l);
 		}
 
-		SkyBlockMultiplayer.getInstance().getSettings().removePlayer(player.getName());
+		SkyBlockMultiplayer.getInstance().getSettings().removePlayerInfo(player.getName());
 
 		for (IslandInfo ii : pi.getBuiltPermissionList().values()) {
 			SkyBlockMultiplayer.getInstance().getSettings().removeIslandInfoIfNoBuilder(ii);
