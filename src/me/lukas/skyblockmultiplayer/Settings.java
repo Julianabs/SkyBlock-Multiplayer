@@ -209,17 +209,17 @@ public class Settings {
 		if (pi == null) {
 			pi = SkyBlockMultiplayer.getInstance().loadPlayerInfo(playerName);
 			if (pi != null) {
-				this.addPlayer(playerName, pi);
+				this.addPlayerInfo(pi);
 			}
 		}
 		return pi;
 	}
 
-	public void addPlayer(String playerName, PlayerInfo pi) {
-		this.players.put(playerName, pi);
+	public void addPlayerInfo(PlayerInfo pi) {
+		this.players.put(pi.getPlayerName(), pi);
 	}
 
-	public void removePlayer(String playerName) {
+	public void removePlayerInfo(String playerName) {
 		this.players.remove(playerName);
 	}
 
