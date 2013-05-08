@@ -2,11 +2,14 @@ package me.lukas.skyblockmultiplayer;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.TreeType;
@@ -18,6 +21,12 @@ import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.util.BlockVector;
 import org.jnbt.ByteArrayTag;
 import org.jnbt.CompoundTag;
@@ -138,7 +147,7 @@ public class CreateIsland {
 		int xd = (int) Math.round(px / (distance));
 		int zd = (int) Math.round(pz / (distance));
 		int ring = Math.abs(xd) + Math.abs(zd);
-
+		
 		// seite and position auf seite
 		int seite;
 		int posSeite;
@@ -400,14 +409,14 @@ public class CreateIsland {
 						b.setType(Material.CHEST);
 						Chest c = (Chest) b.getState();
 						c.getData().setData((byte) dat);
-						c.getInventory().setContents(CreateIsland.getContent(c.getInventory().getContents(), tileEntitiesMap, vec));
+						c.getInventory().setContents(CreateIsland.getContent(c.getInventory().getContents().length, tileEntitiesMap, vec));
 						c.update(true);
 					}
 					if (id == 23) { // dispenser
 						b.setType(Material.DISPENSER);
 						Dispenser d = (Dispenser) b.getState();
 						d.getData().setData((byte) dat);
-						d.getInventory().setContents(CreateIsland.getContent(d.getInventory().getContents(), tileEntitiesMap, vec));
+						d.getInventory().setContents(CreateIsland.getContent(d.getInventory().getContents().length, tileEntitiesMap, vec));
 						d.update(true);
 					}
 					/*if (id == 25) { // note block, need to be finished, note
@@ -425,7 +434,7 @@ public class CreateIsland {
 						b.setType(Material.FURNACE);
 						Furnace f = (Furnace) b.getState();
 						f.getData().setData((byte) dat);
-						f.getInventory().setContents(CreateIsland.getContent(f.getInventory().getContents(), tileEntitiesMap, vec));
+						f.getInventory().setContents(CreateIsland.getContent(f.getInventory().getContents().length, tileEntitiesMap, vec));
 						if (tileEntitiesMap.containsKey(vec)) {
 							Map<String, Tag> values = (Map<String, Tag>) tileEntitiesMap.get(vec);
 							short burn_time = (Short) values.get("BurnTime").getValue();
@@ -465,32 +474,40 @@ public class CreateIsland {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static ItemStack[] getContent(ItemStack[] source, Map tileEntitiesMap, BlockVector vec) {
-		ItemStack[] items = new ItemStack[source.length];
-		short id = 0;
-		short damage = 0;
-		int amount = 0;
-		int slot = 0;
-		Map<Enchantment, Integer> listEnchantments = new HashMap<Enchantment, Integer>();
+	private static ItemStack[] getContent(int size, Map tileEntitiesMap, BlockVector vec) {
+		ItemStack[] items = new ItemStack[size];
 
 		if (tileEntitiesMap.containsKey(vec)) {
 			Map<String, Tag> values = (Map<String, Tag>) tileEntitiesMap.get(vec);
-			for (Tag item : ((ListTag) values.get("Items")).getValue()) {
-				if (item instanceof CompoundTag) {
-					CompoundTag t = (CompoundTag) item;
+			for (Tag itemTag : ((ListTag) values.get("Items")).getValue()) {
+				ItemStack itemStack = new ItemStack(1);
+				ItemMeta itemMeta = null;
+				int slot = 0;
+				Map<Enchantment, Integer> itemEnchantments = new HashMap<Enchantment, Integer>();
+
+				if (itemTag instanceof CompoundTag) {
+					CompoundTag t = (CompoundTag) itemTag;
 					Map<String, Tag> itemContent = t.getValue();
-					if (itemContent.containsKey("id"))
-						id = (Short) itemContent.get("id").getValue();
-					if (itemContent.containsKey("Damage"))
-						damage = (Short) itemContent.get("Damage").getValue();
-					if (itemContent.containsKey("Count"))
-						amount = (Byte) itemContent.get("Count").getValue();
+					if (itemContent.containsKey("id")) {
+						int id = (Short) itemContent.get("id").getValue();
+						itemStack.setTypeId(id);
+						itemMeta = itemStack.getItemMeta();
+					}
+					if (itemContent.containsKey("Damage")) {
+						short damage = (Short) itemContent.get("Damage").getValue();
+						itemStack.setDurability(damage);
+					}
+					if (itemContent.containsKey("Count")) {
+						int amount = (Byte) itemContent.get("Count").getValue();
+						itemStack.setAmount(amount);
+					}
 					if (itemContent.containsKey("Slot"))
 						slot = (Byte) itemContent.get("Slot").getValue();
 					if (itemContent.containsKey("tag")) {
 						Tag tE = itemContent.get("tag");
-						listEnchantments = new HashMap<Enchantment, Integer>();
 						Map<String, Tag> mE = (Map<String, Tag>) tE.getValue();
+
+						// Start of enchantment for item
 						if (mE.containsKey("ench")) {
 							for (Tag enchs : ((ListTag) mE.get("ench")).getValue()) {
 								CompoundTag ctEnchItem = (CompoundTag) enchs;
@@ -498,19 +515,173 @@ public class CreateIsland {
 
 								int ench_id = (Short) mapEnchs.get("id").getValue();
 								int ench_lvl = (Short) mapEnchs.get("lvl").getValue();
-								listEnchantments.put(Enchantment.getById(ench_id), ench_lvl);
+								itemEnchantments.put(Enchantment.getById(ench_id), ench_lvl);
 							}
 						}
+						// End of enchantment for item
+
+						// Start of stored enchantments
+						if (mE.containsKey("StoredEnchantments")) {
+							Map<Enchantment, Integer> storedEnchantments = new HashMap<Enchantment, Integer>();
+							ListTag list = (ListTag) mE.get("StoredEnchantments");
+							for (Tag tag : list.getValue()) {
+								CompoundTag ct = (CompoundTag) tag;
+								Map<String, Tag> mapEnchs = ct.getValue();
+								int ench_id = (Short) mapEnchs.get("id").getValue();
+								int ench_lvl = (Short) mapEnchs.get("lvl").getValue();
+								storedEnchantments.put(Enchantment.getById(ench_id), ench_lvl);
+							}
+							EnchantmentStorageMeta m = (EnchantmentStorageMeta) itemMeta;
+							for (Enchantment ench : storedEnchantments.keySet()) {
+								m.addEnchant(ench, storedEnchantments.get(ench), true);
+							}
+							itemMeta = m;
+						}
+						// End of stored enchantments
+
+						/*if (mE.containsKey("RepairCost")) { // Required or not required?
+							repairCost = (Integer) mE.get("RepairCost").getValue();
+						}*/
+
+						// Start of display name of item
+						if (mE.containsKey("display")) {
+							Map<String, Tag> list = (Map<String, Tag>) mE.get("display").getValue();
+							if (list.containsKey("Name")) {
+								String itemName = (String) list.get("Name").getValue();
+								itemMeta.setDisplayName(itemName);
+							}
+						}
+						// End of display name of item
+
+						// Start of BookMeta
+						if (itemStack.getType() == Material.WRITTEN_BOOK) {
+							BookMeta m = (BookMeta) itemMeta;
+							if (mE.containsKey("author")) {
+								String author = (String) mE.get("author").getValue();
+								m.setAuthor(author);
+								itemMeta = m;
+							}
+							if (mE.containsKey("title")) {
+								String title = (String) mE.get("title").getValue();
+								m.setTitle(title);
+								itemMeta = m;
+							}
+							if (mE.containsKey("pages")) {
+								ListTag list = (ListTag) mE.get("pages");
+								ArrayList<String> pages = new ArrayList<String>();
+								for (Tag tag : list.getValue()) {
+									String page = (String) tag.getValue();
+									pages.add(page);
+								}
+								m.setPages(pages);
+								itemMeta = m;
+							}
+						}
+						// End of BookMeta
+
+						// Start of FireworkMeta
+						if (itemStack.getType() == Material.FIREWORK) {
+							if (mE.containsKey("Fireworks")) {
+								FireworkMeta m = (FireworkMeta) itemMeta;
+
+								Map<String, Tag> list = (Map<String, Tag>) mE.get("Fireworks").getValue();
+								byte flight = (Byte) list.get("Flight").getValue();
+								m.setPower(flight);
+
+								if (list.containsKey("Explosions")) {
+									ListTag ltExplosions = (ListTag) list.get("Explosions");
+									for (Tag tExplosion : ltExplosions.getValue()) {
+										Map<String, Tag> listEffect = (Map<String, Tag>) tExplosion.getValue();
+										FireworkEffect fe = getFireworkEffect(listEffect);
+										m.addEffect(fe);
+									}
+								}
+								itemMeta = m;
+							}
+						}
+						// End of FireworkMeta
+
+						// Start of FireworkEffectMeta
+						if (itemStack.getType() == Material.FIREWORK_CHARGE) {
+							if (mE.containsKey("Explosion")) {
+								Map<String, Tag> list = (Map<String, Tag>) mE.get("Explosion").getValue();
+								FireworkEffect fb = getFireworkEffect(list);
+								FireworkEffectMeta m = (FireworkEffectMeta) itemMeta;
+								m.setEffect(fb);
+
+								itemMeta = m;
+							}
+						}
+						// End of FireworkEffectMeta
+
+						// Start of LeatherArmorMeta
+						ArrayList<Material> leather = new ArrayList<Material>();
+						leather.add(Material.LEATHER_BOOTS);
+						leather.add(Material.LEATHER_CHESTPLATE);
+						leather.add(Material.LEATHER_HELMET);
+						leather.add(Material.LEATHER_LEGGINGS);
+						if (leather.contains(itemStack.getType())) {
+							Map<String, Tag> list = (Map<String, Tag>) mE.get("display").getValue();
+							LeatherArmorMeta m = (LeatherArmorMeta) itemMeta;
+							if (list.containsKey("color")) {
+								int color = (Integer) list.get("color").getValue();
+								m.setColor(Color.fromRGB(color));
+								itemMeta = m;
+							}
+						}
+						// End of LeatherArmorMeta
 					}
 				}
-				ItemStack i = new ItemStack(id);
-				i.setAmount(amount);
-				i.setDurability(damage);
-				i.addUnsafeEnchantments(listEnchantments);
-				items[slot] = i;
+				itemStack.setItemMeta(itemMeta);
+				itemStack.addEnchantments(itemEnchantments); // If that is done before setting the itemMeta, the enchantments will be removed...
+				items[slot] = itemStack;
 			}
 		}
 
 		return items;
+	}
+
+	public static FireworkEffect getFireworkEffect(Map<String, Tag> list) {
+		FireworkEffect.Builder fb = FireworkEffect.builder();
+
+		int[] fadeColors = new int[0], colors = new int[0];
+
+		if (list.containsKey("Type")) {
+			int type = -1;
+			type = (Byte) list.get("Type").getValue();
+			if (type != -1) {
+				FireworkEffect.Type feType = null;
+				for (FireworkEffect.Type fet : FireworkEffect.Type.values()) {
+					if (fet.ordinal() == type)
+						feType = fet;
+				}
+				if (feType != null)
+					fb.with(feType);
+			}
+		}
+		if (list.containsKey("FadeColors")) {
+			fadeColors = (int[]) list.get("FadeColors").getValue();
+			for (int i = 0; i < fadeColors.length; i++) {
+				fb.withFade(Color.fromRGB(fadeColors[i]));
+			}
+		}
+		if (list.containsKey("Colors")) {
+			colors = (int[]) list.get("Colors").getValue();
+			for (int i = 0; i < colors.length; i++) {
+				fb.withColor(Color.fromRGB(colors[i]));
+			}
+		}
+		if (list.containsKey("Trail")) {
+			int i = (Byte) list.get("Trail").getValue();
+			if (i == 1)
+				fb.withTrail();
+		}
+		if (list.containsKey("Flicker")) {
+			int i = (Byte) list.get("Flicker").getValue();
+			if (i == 1)
+				fb.withFlicker();
+		}
+
+		return fb.build();
 	}
 }
