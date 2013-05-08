@@ -30,8 +30,6 @@ public class PlayerDeath implements Listener {
 			return;
 		}
 
-		System.out.println(pi.isPlaying());
-
 		if (!pi.isPlaying()) {
 			pi.setOldInventory(player.getInventory().getContents());
 			pi.setOldArmor(player.getInventory().getArmorContents());
