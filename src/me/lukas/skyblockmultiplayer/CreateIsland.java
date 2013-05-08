@@ -147,7 +147,7 @@ public class CreateIsland {
 		int xd = (int) Math.round(px / (distance));
 		int zd = (int) Math.round(pz / (distance));
 		int ring = Math.abs(xd) + Math.abs(zd);
-
+		
 		// seite and position auf seite
 		int seite;
 		int posSeite;
@@ -553,7 +553,7 @@ public class CreateIsland {
 						}
 						// End of display name of item
 
-						// Start of BookMete
+						// Start of BookMeta
 						if (itemStack.getType() == Material.WRITTEN_BOOK) {
 							BookMeta m = (BookMeta) itemMeta;
 							if (mE.containsKey("author")) {
@@ -601,7 +601,7 @@ public class CreateIsland {
 						}
 						// End of FireworkMeta
 
-						// Start of FireworkCharge
+						// Start of FireworkEffectMeta
 						if (itemStack.getType() == Material.FIREWORK_CHARGE) {
 							if (mE.containsKey("Explosion")) {
 								Map<String, Tag> list = (Map<String, Tag>) mE.get("Explosion").getValue();
@@ -612,7 +612,7 @@ public class CreateIsland {
 								itemMeta = m;
 							}
 						}
-						// End of FireworkCharge
+						// End of FireworkEffectMeta
 
 						// Start of LeatherArmorMeta
 						ArrayList<Material> leather = new ArrayList<Material>();
@@ -662,7 +662,7 @@ public class CreateIsland {
 		if (list.containsKey("FadeColors")) {
 			fadeColors = (int[]) list.get("FadeColors").getValue();
 			for (int i = 0; i < fadeColors.length; i++) {
-				fb.withColor(Color.fromRGB(fadeColors[i]));
+				fb.withFade(Color.fromRGB(fadeColors[i]));
 			}
 		}
 		if (list.containsKey("Colors")) {
