@@ -124,7 +124,9 @@ public class SkyBlockCommand implements CommandExecutor {
 				}
 
 				if (args.length < 2) {
-					sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+					sender.sendMessage("Missing arguments.");
+					sender.sendMessage("/skb set offline");
+					sender.sendMessage("/skb set online");
 					return true;
 				}
 				if (args[1].equalsIgnoreCase("offline")) {
@@ -133,14 +135,10 @@ public class SkyBlockCommand implements CommandExecutor {
 				if (args[1].equalsIgnoreCase("online")) {
 					return this.setSkyBlockOnline(sender);
 				}
-				if (args[1].equalsIgnoreCase("closed")) {
-					return this.setClosed(sender);
-				}
-				if (args[1].equalsIgnoreCase("opened")) {
-					return this.setOpened(sender);
-				}
 				if (args.length < 3) {
-					sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+					sender.sendMessage("Missing arguments.");
+					sender.sendMessage("/skb set language <language>");
+					sender.sendMessage("/skb set gamemode <pvp, build>");
 					return true;
 				}
 				if (args[1].equalsIgnoreCase("language")) {
@@ -155,7 +153,9 @@ public class SkyBlockCommand implements CommandExecutor {
 			}
 			if (args[0].equalsIgnoreCase("reload")) {
 				if (args.length < 2) {
-					sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+					sender.sendMessage("Missing arguments.");
+					sender.sendMessage("/skb reload config");
+					sender.sendMessage("/skb reload language");
 					return true;
 				}
 				if (args[1].equalsIgnoreCase("config")) {
@@ -216,7 +216,8 @@ public class SkyBlockCommand implements CommandExecutor {
 
 			if (args[0].equalsIgnoreCase("remove")) { // TODO: Rechange this
 				if (args.length == 0) {
-					player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+					sender.sendMessage("Missing arguments.");
+					player.sendMessage("/skb remove <island number>");
 					return true;
 				}
 				return this.removeIsland(player, args[1]);
@@ -242,7 +243,8 @@ public class SkyBlockCommand implements CommandExecutor {
 
 				if (args[1].equalsIgnoreCase("join")) {
 					if (args.length == 2) {
-						player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+						sender.sendMessage("Missing arguments.");
+						player.sendMessage("/skb home join <player name>");
 						return true;
 					}
 					return this.homeJoin(player, args[2]);
@@ -250,7 +252,8 @@ public class SkyBlockCommand implements CommandExecutor {
 
 				if (args[1].equalsIgnoreCase("add")) {
 					if (args.length == 2) {
-						player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+						sender.sendMessage("Missing arguments.");
+						player.sendMessage("/skb home add <player name>");
 						return true;
 					}
 					return this.homeAdd(player, args[2]);
@@ -258,14 +261,16 @@ public class SkyBlockCommand implements CommandExecutor {
 
 				if (args[1].equalsIgnoreCase("remove")) {
 					if (args.length == 2) {
-						player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+						sender.sendMessage("Missing arguments.");
+						player.sendMessage("/skb home remove <player name>");
 						return true;
 					}
 					return this.homeRemove(player, args[2]);
 				}
 			}
 
-			player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+			// player.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+			player.sendMessage("Wrong or missing argument.");
 			return true;
 		}
 		return false;
@@ -291,8 +296,6 @@ public class SkyBlockCommand implements CommandExecutor {
 		String sb_home_set = Language.MSGS_COMMAND_HOME_SET.getSentence() + "\n";
 
 		String sb_newIsland = Language.MSGS_COMMAND_NEW_ISLAND.getSentence() + "\n";
-		String sb_closed = Language.MSGS_COMMAND_SET_CLOSED.getSentence() + "\n";
-		String sb_opened = Language.MSGS_COMMAND_SET_OPENED.getSentence() + "\n";
 		String sb_setOffline = Language.MSGS_COMMAND_SET_OFFLINE.getSentence() + "\n";
 		String sb_setOnline = Language.MSGS_COMMAND_SET_ONLINE.getSentence() + "\n";
 		String sb_tower_recreate = Language.MSGS_COMMAND_TOWER_RECREATE.getSentence() + "\n";
@@ -324,7 +327,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			return true;
 		} else if (page >= 2) {
 			String top = ChatColor.GOLD + "----- " + pluginName + " help index (2/2) " + ChatColor.GOLD + " -----\n" + ChatColor.WHITE;
-			String msgs = top + sb_newIsland + sb_closed + sb_opened + sb_setOffline + sb_setOnline + sb_tower_recreate + sb_setLanguage + sb_setGameMode + sb_removeIsland + sb_setOwner + sb_reset + sb_reload_config + sb_reload_language;
+			String msgs = top + sb_newIsland + sb_setOffline + sb_setOnline + sb_tower_recreate + sb_setLanguage + sb_setGameMode + sb_removeIsland + sb_setOwner + sb_reset + sb_reload_config + sb_reload_language;
 
 			for (String s : msgs.split("\n")) {
 				if (!s.trim().equalsIgnoreCase("")) {
@@ -489,7 +492,7 @@ public class SkyBlockCommand implements CommandExecutor {
 			sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_GAMEMODE_CHANGED.getSentence());
 			return true;
 		}
-		sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_WRONG_ARGS.getSentence());
+		sender.sendMessage("/skb set gamemode <pvp, build>");
 		return true;
 	}
 

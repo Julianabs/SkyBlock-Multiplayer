@@ -50,7 +50,6 @@ public enum Language {
 	MSGS_COMMAND_HOME_LIST("msgs.commands.homeList", "§6/skyblock home list§7 - show all friends from your list"),
 	MSGS_COMMAND_HOME_SET("msgs.commands.homeSet", "§6/skyblock home set§7 - change your spawn location"),
 	/* end of command list */
-	MSGS_WRONG_ARGS("msgs.wrongArgs", "Incorrect or missing arguments"),
 	MSGS_WELCOME1("msgs.welcome1", "Welcome to the world SkyBlock for multiplayer! At the moment there are "),
 	MSGS_WELCOME2("msgs.welcome2", " islands and  "),
 	MSGS_WELCOME3("msgs.welcome3", " players. Use \"/skyblock start\" to get an own island."),
