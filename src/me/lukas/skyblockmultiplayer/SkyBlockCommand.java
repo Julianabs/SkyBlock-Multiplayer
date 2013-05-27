@@ -395,30 +395,6 @@ public class SkyBlockCommand implements CommandExecutor {
 	}
 
 	/**
-	 * Lock SkyBlock.
-	 * 
-	 * @param sender
-	 * @return
-	 */
-	private boolean setOpened(CommandSender sender) {
-		SkyBlockMultiplayer.getInstance().getSettings().setIsLocked(false);
-		sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_IS_NOW_OPENED.getSentence());
-		return true;
-	}
-
-	/**
-	 * Unlock SkyBlock
-	 * 
-	 * @param sender
-	 * @return
-	 */
-	private boolean setClosed(CommandSender sender) {
-		SkyBlockMultiplayer.getInstance().getSettings().setIsLocked(true);
-		sender.sendMessage(SkyBlockMultiplayer.getInstance().pName + Language.MSGS_IS_NOW_CLOSED.getSentence());
-		return true;
-	}
-
-	/**
 	 * Change the lanugage.
 	 * 
 	 * @param sender that types the command.
