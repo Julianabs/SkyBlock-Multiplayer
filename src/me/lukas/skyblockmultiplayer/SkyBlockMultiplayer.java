@@ -1,13 +1,18 @@
 package me.lukas.skyblockmultiplayer;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import me.lukas.skyblockmultiplayer.listeners.*;
 import me.lukas.skyblockmultiplayer.parser.*;
@@ -94,7 +99,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		if (!this.directoryPlayers.exists()) {
 			this.directoryPlayers.mkdir();
 		}
-		
+
 		this.loadPlayersAndIslandFiles();
 
 		// register command
@@ -365,8 +370,8 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		yamlIslandInfo.set(EnumIslandConfig.ISLAND_OWNER.getPath(), ii.getIslandOwner());
 		yamlIslandInfo.set(EnumIslandConfig.ISLAND_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getIslandLocation()));
 		yamlIslandInfo.set(EnumIslandConfig.HOME_LOCATION.getPath(), LocationParser.getStringFromLocation(ii.getHomeLocation()));
-
 		yamlIslandInfo.set(EnumIslandConfig.FRIENDS.getPath(), ii.getFriends());
+
 		try {
 			yamlIslandInfo.save(filePlayerInfo);
 		} catch (IOException e) {
@@ -377,7 +382,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 	@SuppressWarnings("unchecked")
 	public PlayerInfo loadPlayerInfo(String playerName) {
 		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
-		File filePlayerInfo = new File(this.directoryPlayers, playerName + ".yml");
+		File filePlayerInfo = new File(this.getDataFolder() + File.separator + "players" + File.separator + playerName, "info.yml");
 		if (!filePlayerInfo.exists()) {
 			return null;
 		}
@@ -482,22 +487,6 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		pi.setIslandLevel(islandLevel);
 
-		ItemStack[] islandInventory = new ItemStack[36];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_INVENTORY.getPath())) {
-			islandInventory = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.ISLAND_INVENTORY.getPath()), 36);
-		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), new ArrayList<String>());
-		}
-		pi.setIslandInventory(islandInventory);
-
-		ItemStack[] islandArmor = new ItemStack[4];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.ISLAND_ARMOR.getPath())) {
-			islandArmor = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.ISLAND_ARMOR.getPath()), 4);
-		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), new ArrayList<String>());
-		}
-		pi.setIslandArmor(islandArmor);
-
 		Location oldLocation = null;
 		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_LOCATION.getPath())) {
 			oldLocation = LocationParser.parseStringToLocation(yamlPlayerInfo.get(EnumPlayerConfig.OLD_LOCATION.getPath()).toString());
@@ -550,21 +539,14 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		}
 		pi.setOldLevel(oldLevel);
 
-		ItemStack[] oldInventory = new ItemStack[36];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_INVENTORY.getPath())) {
-			oldInventory = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.OLD_INVENTORY.getPath()), 36);
-		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), new ArrayList<String>());
+		// load inventories
+		try {
+			this.loadPlayerInventories(pi);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (InvalidConfigurationException e1) {
+			e1.printStackTrace();
 		}
-		pi.setOldInventory(oldInventory);
-
-		ItemStack[] oldArmor = new ItemStack[4];
-		if (yamlPlayerInfo.contains(EnumPlayerConfig.OLD_ARMOR.getPath())) {
-			oldArmor = ItemParser.getItemStackArrayFromHashMap(yamlPlayerInfo.getConfigurationSection(EnumPlayerConfig.OLD_ARMOR.getPath()), 4);
-		} else {
-			yamlPlayerInfo.set(EnumPlayerConfig.OLD_ARMOR.getPath(), new ArrayList<String>());
-		}
-		pi.setOldArmor(oldArmor);
 
 		try {
 			yamlPlayerInfo.save(filePlayerInfo);
@@ -577,7 +559,7 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 
 	public void savePlayerInfo(PlayerInfo pi) {
 		YamlConfiguration yamlPlayerInfo = new YamlConfiguration();
-		File filePlayerInfo = new File(this.directoryPlayers, pi.getPlayerName() + ".yml");
+		File filePlayerInfo = new File(pi.getPlayerFolder(), "info.yml");
 
 		// island info
 		if (pi.getIslandInfo() != null) {
@@ -590,22 +572,61 @@ public class SkyBlockMultiplayer extends JavaPlugin {
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_HEALTH.getPath(), "" + pi.getIslandHealth());
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_EXP.getPath(), "" + pi.getIslandExp());
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_LEVEL.getPath(), "" + pi.getIslandLevel());
-		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_INVENTORY.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getIslandInventory()));
-		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_ARMOR.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getIslandArmor()));
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_LOCATION.getPath(), LocationParser.getStringFromLocation(pi.getOldLocation()));
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_FOOD.getPath(), "" + pi.getOldFood());
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_HEALTH.getPath(), "" + pi.getOldHealth());
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_EXP.getPath(), "" + pi.getOldExp());
 		yamlPlayerInfo.set(EnumPlayerConfig.OLD_LEVEL.getPath(), "" + pi.getOldLevel());
-		yamlPlayerInfo.set(EnumPlayerConfig.OLD_INVENTORY.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getOldInventory()));
-		yamlPlayerInfo.set(EnumPlayerConfig.OLD_ARMOR.getPath(), ItemParser.getHashMapFromItemStackArray(pi.getOldArmor()));
 		yamlPlayerInfo.set(EnumPlayerConfig.ISLAND_BUILTLIST.getPath(), pi.getBuildListNumbers());
+
+		// save inventories
+		try {
+			this.savePlayerInventories(pi);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 		try {
 			yamlPlayerInfo.save(filePlayerInfo);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void savePlayerInventories(PlayerInfo pi) throws IOException {
+		File fileInventory = new File(pi.getPlayerFolder(), "inventory.inv");
+		BufferedOutputStream out = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(fileInventory)));
+
+		YamlConfiguration yamlInventory = new YamlConfiguration();
+		yamlInventory.set("islandInventory", ItemParser.getHashMapFromItemStackArray(pi.getIslandInventory()));
+		yamlInventory.set("islandArmor", ItemParser.getHashMapFromItemStackArray(pi.getIslandArmor()));
+		yamlInventory.set("oldInventory", ItemParser.getHashMapFromItemStackArray(pi.getOldInventory()));
+		yamlInventory.set("oldArmor", ItemParser.getHashMapFromItemStackArray(pi.getOldArmor()));
+
+		out.write(yamlInventory.saveToString().getBytes());
+		out.flush();
+		out.close();
+	}
+
+	private void loadPlayerInventories(PlayerInfo pi) throws IOException, InvalidConfigurationException {
+		File fileInventory = new File(pi.getPlayerFolder(), "inventory.inv");
+		FileInputStream in = new FileInputStream(fileInventory);
+		GZIPInputStream zipin = new GZIPInputStream(in);
+		InputStreamReader reader = new InputStreamReader(zipin);
+		BufferedReader br = new BufferedReader(reader);
+
+		String readed;
+		String inventoryString = "";
+		while ((readed = br.readLine()) != null) {
+			inventoryString += readed + System.getProperty("line.separator");
+		}
+		br.close();
+		YamlConfiguration yml = new YamlConfiguration();
+		yml.loadFromString(inventoryString);
+		pi.setIslandInventory(ItemParser.getItemStackArrayFromHashMap(yml.getConfigurationSection("islandInventory"), 36));
+		pi.setIslandArmor(ItemParser.getItemStackArrayFromHashMap(yml.getConfigurationSection("islandArmor"), 4));
+		pi.setOldInventory(ItemParser.getItemStackArrayFromHashMap(yml.getConfigurationSection("oldInventory"), 36));
+		pi.setOldArmor(ItemParser.getItemStackArrayFromHashMap(yml.getConfigurationSection("oldArmor"), 4));
 	}
 
 	/**

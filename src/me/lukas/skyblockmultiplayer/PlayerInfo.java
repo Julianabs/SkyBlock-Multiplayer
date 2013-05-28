@@ -1,5 +1,6 @@
 package me.lukas.skyblockmultiplayer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.bukkit.Bukkit;
@@ -10,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 public class PlayerInfo {
 
 	private String playerName;
+	private File filePlayerFolder;
 
 	private IslandInfo islandInfo;
 	private boolean isPlaying;
@@ -41,7 +43,6 @@ public class PlayerInfo {
 	private int oldLevel;
 
 	public PlayerInfo(String playerName) {
-
 		this.playerName = playerName;
 
 		this.isPlaying = false;
@@ -72,6 +73,9 @@ public class PlayerInfo {
 		this.islandLevel = 0;
 		this.oldLevel = 0;
 
+		this.filePlayerFolder = new File(SkyBlockMultiplayer.getInstance().getDataFolder() + File.separator + "players" + File.separator + playerName);
+		if (!this.filePlayerFolder.exists())
+			this.filePlayerFolder.mkdir();
 	}
 
 	public void setPlayerName(String s) {
@@ -79,11 +83,15 @@ public class PlayerInfo {
 	}
 
 	public Player getPlayer() {
-		return Bukkit.getPlayer(this.playerName);
+		return Bukkit.getPlayerExact(this.playerName);
 	}
 
 	public String getPlayerName() {
 		return this.playerName;
+	}
+
+	public File getPlayerFolder() {
+		return this.filePlayerFolder;
 	}
 
 	public boolean getHasIsland() {
